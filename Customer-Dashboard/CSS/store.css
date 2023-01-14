@@ -1,0 +1,86 @@
+.card{
+    width: 400px;
+    height: 100px;
+    background-color: rgb(255, 255, 255);
+    box-shadow: 0px 0px 36px 15px rgba(184, 179, 179, 0.28);
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+}
+
+.nav-bar{
+    max-width: fit-content;
+}
+
+img{
+    width:50px;
+    height: 50px;
+}
+
+label{
+    font-size: 20px;
+    color: rgb(239, 216, 6);
+    font-weight: 600;
+}
+
+.item{
+    margin-top: 50px;
+    width:300px;
+    height: 350px;
+    background-color: rgb(255, 255, 255);
+    box-shadow: 0px 0px 36px 15px rgba(184, 179, 179, 0.28);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    
+}
+
+
+.goods{
+        width:250px;
+        height:200px;
+        margin-bottom: 20px;
+}
+
+
+.buy{
+    background-color: rgb(13, 113, 133);
+    color: wheat;
+    width:250px;
+    
+}
+
+.buy :hover{
+    background-color: rgb(209, 252, 238);
+}
+
+.points{
+    background-color: rgb(14, 183, 143);
+    margin-top: 10px;
+    width: 90px;
+    height: 30px;
+    border-radius: 50px;
+    color:rgb(235, 238, 238);
+    
+}
+
+.shop{
+    display: flex;
+    flex-direction: row;
+    gap:50px;
+}
+
+.c{
+    width:20px;
+    height: 20px;
+    padding: 2px;
+}
+
+.amount{
+    font-size: 18px;
+    color: rgb(244, 244, 116);
+    font-size: medium;
+}
