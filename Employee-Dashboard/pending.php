@@ -1,34 +1,7 @@
 <?php
 include_once('../Home-Page/config.php');
-
-if (isset($_POST['complete'])) {
-
-  $result = mysqli_query($conn, "UPDATE complete set e_complete=1 where order_id=1 ");
-
-  $result5 = mysqli_query($conn, "SELECT * from complete ");
-
-  $result6=mysqli_query($conn,"UPDATE registered_employee SET emp_points=20 where emp_id=1 ");
-
-  $row = mysqli_fetch_assoc($result5);
-  if ($row['c_complete'] == 1 && $row['e_complete'] == 1) {
-    $sql2 = mysqli_query($conn, "INSERT INTO emp_payment(order_id,emp_id) VALUES(1,1)");
-  }
-
-
-  if ($result && $result5 && $sql2 && $result6) {
-    echo "<script>alert('Job completed sucussfully');</script>";
-  } else {
-    die("invalid qury" . mysqli_error($conn));
-  }
-}
-
-
-$sql = "SELECT job_order_id,job_order_category,job_order_date ,job_order_address from job_order where job_order_id=1";
-$result1 = mysqli_query($conn, $sql);
-
-if (!$result1) {
-  //  die("Invalid query".mysqli_error());
-} else {
+session_start();
+print_r($_SESSION);
 
 ?>
 
@@ -113,6 +86,15 @@ if (!$result1) {
               </thead>
               <tbody class="text-center">
               <?php
+            $empid=$_SESSION['emp_id'];
+
+            $sql = "SELECT job_order_id,job_order_category,job_order_date ,job_order_address from job_order where aemp_id=$empid";
+            $result1 = mysqli_query($conn, $sql);
+
+            if (!$result1) {
+                die("Invalid query".mysqli_error($conn));
+                
+            } else {
 
               while ($row = mysqli_fetch_assoc($result1)) {
 
@@ -122,52 +104,49 @@ if (!$result1) {
                 echo "  <td>$row[job_order_date]</td>";
                 echo "  <td>$row[job_order_address]</td>";
 
-                echo "<td>
-                       <button type='submit' value='Complete' name='complete' class='btn btn-success ms-1'>Complete</button>
+                echo "<td>  
+                <form method='post'>
+                  <input type='submit' class='btn btn-success' name='complete_" . $row['job_order_id'] . "' value='Accept' id='accept'>
+                </form>
+                 </td>";
+               echo " </tr>";
+              
+               if (isset($_POST['complete_' . $row['job_order_id']])) {
+                $result = mysqli_query($conn, "UPDATE complete set e_complete=1 where order_id=" . $row['job_order_id'] . " ");
+                $result5 = mysqli_query($conn, "SELECT * from complete where order_id=" . $row['job_order_id'] . " ");
+                $result6=mysqli_query($conn,"UPDATE registered_employee SET emp_points=20 where emp_id='$empid' ");
 
-                       </td>";
+                $row1 = mysqli_fetch_assoc($result5);
+                
+                print_r($row1);
+                if ($row1['c_complete'] == 1 && $row1['e_complete'] == 1) {
+                  $result7 = mysqli_query($conn, "INSERT INTO emp_payment(order_id,emp_id) VALUES(" . $row['job_order_id'] . " ,$empid)");
+                }
+                if(!$result7){
+                  die("invalid".mysqli_error($conn));
+                }
 
-
-                echo "  </tr>";
-              }
+                if ($result || $result5 || $result6 || $result7) {
+                  echo "<script>alert('Job completed sucussfully');</script>";
+                } else {
+                  die("invalid qury" . mysqli_error($conn));
+                }
+                }
             }
+        }
+      
+      ?>
+             
 
-              ?>
-              <!-- <tr> 
-                      <td>
-                          10234
-                      </td>
-                      <td>
-                        Lorem ipsum aute magna nulla labore
-                      </td>
-                      <td>2022-01-15</td>
-                      <td> <a href="#" class="btn btn-primary text-white ">Confirm</a>
-                      </td>
-                    </tr>
-                  </tbody>
-              </table>
-           
-    <table class="table table py-4">
-        <thead  class="text-center">
-          <tr>
-            <th scope="col">Order ID</th>
-            <th scope="col">Job Details</th>
-            <th scope="col">Date</th>
-            <th scope="col"></th>
-          </tr>
-        </thead>
-        <tbody class="text-center">
-            <tr>
-              <td>
-                  10234
-              </td>
-              <td>
-                Lorem ipsum aute magna nulla labore
-              </td>
-              <td>2022-01-15</td>
-              <td> <a href="#" class="btn btn-primary text-white ">Confirm</a>
-              </td>
-            </tr>-->
+
+
+
+
+
+
+
+
+
               </tbody>
             </table>
           </form>

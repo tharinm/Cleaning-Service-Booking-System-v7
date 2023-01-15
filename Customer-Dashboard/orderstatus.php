@@ -1,12 +1,12 @@
 <?php
-// session_start();
-// print_r($_SESSION);
+session_start();
+ print_r($_SESSION);
 include_once('../Home-page/config.php');
 
 ?>
 <?php
 
-// $cus_id=$_SESSION['id'];
+// $cusid=$_SESSION['cus_id'];
 
 
 /*if (isset($_POST['pay'])) {
@@ -96,24 +96,34 @@ include_once('../Home-page/config.php');
             </tr>
           </div>
           <?php
-          // $cus_id=$_SESSION['id'];
-          // $result=mysqli_query($conn,"SELECT job_order_id from job_order where cus_id=$cus_id");
-          // $row1=mysqli_fetch_array($result);
-          $query = mysqli_query($conn, "SELECT  job_order_id,job_order_category,job_order_date,status,emp_name,emp_filename,emp_status,filename from job_order,registered_employee,image where job_order_id=1 and emp_id=1 and id=1 ");
+
+          $cusid=$_SESSION['cus_id'];
+          $result=mysqli_query($conn,"SELECT job_order_id,job_order_category,status from job_order where cus_id='$cusid' ORDER BY job_order_id DESC LIMIT 1");
+          $row1=mysqli_fetch_array($result);
+          if (!empty($row1)) {
+
+            $orderid=$row1['job_order_id'];
+            // $empid=$row1['aemp_id'];
+        
+          
+
+          
+
+          
+        // if(!$query){
+        //       die("invalied".mysqli_error($conn));
+        // }
+
 
           //  $numrow = mysqli_num_rows($query);
-
-
-          if ($query) {
-
-            // if($numrow!=0){
-            while ($row = mysqli_fetch_assoc($query)) {
-
+          
+          
+              if ($row1['status'] == 'Pending'){
           ?>
               <div class="col-md-4 mb-4">
                 <tr>
                   <td scope="col " class="text-success align-right" colspan="3"><?php
-                                                                                echo $row['status'];
+                                                                                echo $row1['status'];
                                                                                 ?></td>
                 </tr>
               </div>
@@ -122,8 +132,8 @@ include_once('../Home-page/config.php');
       <tbody class="text-center">
         <div class="col-md-4 mb-4">
           <tr>
-            <td scope="row"><?php echo $row['job_order_id']; ?></td>
-            <td><?php echo $row['job_order_category']; ?></td>
+            <td scope="row"><?php echo $row1['job_order_id']; ?></td>
+            <td><?php echo $row1['job_order_category']; ?></td>
             <!-- <td><button type="button" class="btn btn-danger text-white btn btn-sm col-sm-7">Cancel</button></td> -->
           </tr>
         </div>
@@ -134,7 +144,53 @@ include_once('../Home-page/config.php');
 
           </tr>
         </div>
-        <?php if ($row['status'] == 'Accept') { ?>
+        <?php 
+       }
+        
+        if ($row1['status'] == 'Accept') { 
+          
+          $query1=mysqli_query($conn,"SELECT aemp_id from job_order where job_order_id='$orderid'");
+          $aempid=mysqli_fetch_array($query1);
+          $empid=$aempid['aemp_id'];
+          $query = mysqli_query($conn, "SELECT job_order.job_order_id, job_order.job_order_category, job_order.job_order_date, job_order.status, registered_employee.emp_name, registered_employee.emp_filename, registered_employee.emp_status, image.filename
+          FROM job_order
+          JOIN registered_employee ON job_order.aemp_id = registered_employee.emp_id
+          JOIN image ON image.id = registered_employee.emp_id
+          WHERE job_order.job_order_id = '$orderid'
+          AND registered_employee.emp_id = '$empid'
+          AND image.id = '$empid'; ");
+          
+           if ($query) {
+
+            
+            while ($row = mysqli_fetch_assoc($query)) {
+          ?>
+
+            <div class="col-md-4 mb-4">
+                <tr>
+                  <td scope="col " class="text-success align-right" colspan="3"><?php
+                                                                                echo $row1['status'];
+                                                                                ?></td>
+                </tr>
+              </div>
+
+              <tbody class="text-center">
+              <div class="col-md-4 mb-4">
+                <tr>
+                  <td scope="row"><?php echo $row1['job_order_id']; ?></td>
+                  <td><?php echo $row1['job_order_category']; ?></td>
+                  <!-- <td><button type="button" class="btn btn-danger text-white btn btn-sm col-sm-7">Cancel</button></td> -->
+                </tr>
+              </div>
+              <div class="col-md-4 mb-4">
+                <tr>
+                  <td scope="col"></td>
+                  <td scope="col"></td>
+
+                </tr>
+              </div>
+
+
           <div class="col-md-4 mb-4">
             <tr>
               <td scope="col" colspan="3">Employee Details</td>
@@ -161,7 +217,8 @@ include_once('../Home-page/config.php');
     <?php
               }
             }
-          } ?>
+          }
+         } ?>
 
 
       </tbody>

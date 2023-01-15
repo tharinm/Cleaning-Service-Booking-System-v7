@@ -1,39 +1,9 @@
 <?php
-// session_start();
+session_start();
 include_once('../Home-Page/config.php');
-
-// print_r($_SESSION);
-//  $cus_id=$_SESSION['id'];
-
-if (isset($_POST['complete'])) {
-
-    $sql = mysqli_query($conn, "UPDATE customer SET cus_points= 100 WHERE cus_id=1");
-    if (!$sql) {
-        die("Inavlid query" . mysqli_error($conn));
-    }
-    $result = mysqli_query($conn, "INSERT INTO complete(order_id,c_complete)VALUES (1,1)");
-
-    if ($result) {
-        echo "<script>alert('Job completed sucussfully')</script>";
-        header("refresh: 0; url=http://localhost/Dcsmsv-5.1/Customer-Dashboard/myorders.php");
-    } else {
-        die("invalid qury" . mysqli_error($conn));
-    }
-}
-//   $customer=$_SESSION['username'];
-//   $email=$_SESSION['email'];
-//   $result1=mysqli_query($conn,"SELECT cus_id from customer where user_name like '$customer' or email like '$email' ");
-//   $row=mysqli_fetch_assoc($result1);
-//   $_SESSION['id'] = $row['cus_id'];
-
-$sql = "SELECT job_order_id,job_order_category,job_order_date from job_order where cus_id =1";
-$result1 = mysqli_query($conn, $sql);
-
-if (!$result1) {
-    die("Invalid query" . mysqli_error($conn));
-} else {
-
-
+error_reporting(E_ALL);
+ print_r($_SESSION);
+ $cusid=$_SESSION['cus_id'];
 ?>
 
     <!DOCTYPE html>
@@ -94,7 +64,9 @@ if (!$result1) {
             <div class="content">
                 <nav class="navbar navbar-expand-md py-3 navbar-light bg-light ">
                     <img src="image.png" class="avatar">
-                    <input type="submit" class="btn btn-secondary default btn  " value="Logout" onclick="window.location.href='../Home-Page/index.html'" name="logout" />
+                    <form method="POST" action="http://localhost/Dcsmsv-5.1%20-%20Copy/Home-Page/index.html">
+                       <input type="submit" class="btn btn-secondary default btn" value="Logout" onclick="logOut()" name="logout" />
+                 </form>
                 </nav>
 
                 <div class="registeremp ms-5 px-3 pt-4">
@@ -110,25 +82,59 @@ if (!$result1) {
                                     </tr>
                                 </thead>
                                 <tbody class="text-center">
-                                <?php
+            <?php
+                $sql = "SELECT job_order_id,job_order_category,job_order_date,status from job_order where cus_id ='$cusid'";
+                $result1 = mysqli_query($conn, $sql);
+                
+                if (!$result1) {
+                    die("Invalid query" . mysqli_error($conn));
+                } else {
 
-                                while ($row1 = mysqli_fetch_assoc($result1)) {
+                while ($row1 = mysqli_fetch_assoc($result1)) {
 
-                                    echo   "<tr>";
-                                    echo "  <td>$row1[job_order_id]</td>";
-                                    echo "  <td>$row1[job_order_category]</td>";
-                                    echo "  <td>$row1[job_order_date]</td>";
+                    if($row1['status']=='Accept'){
+                        
+                    echo   "<tr>";
+                    echo "  <td>$row1[job_order_id]</td>";
+                    echo "  <td>$row1[job_order_category]</td>";
+                    echo "  <td>$row1[job_order_date]</td>";
 
-                                    echo "<td>
-                             <input type='submit' value='Complete' name ='complete' class='btn btn-primary btn-sm col-sm-9'>
+                    echo "<td>  
+                        <form method='post'>
+                        
+                            <input type='submit' value='Complete' id='complete_button_" . $row1['job_order_id'] . "' name='complete_" . $row1['job_order_id'] . "' class='btn btn-primary btn-sm col-sm-9'>
+                        </form>
                         </td>";
+                    echo "  </tr>";
+                    
+                    if (isset($_POST['complete_' . $row1['job_order_id']])) {
+                        
+                        $sql = mysqli_query($conn, "UPDATE customer SET cus_points= 100 WHERE cus_id='$cusid'");
+                        $sql2 =mysqli_query($conn,"UPDATE job_order SET status='Completed' where job_order_id=" . $row1['job_order_id'] . " ");
+                        if (!$sql2) {
+                            die("Inavlid query" . mysqli_error($conn));
+                        }
+                        $result = mysqli_query($conn, "INSERT INTO complete(order_id,c_complete)VALUES (" . $row1['job_order_id'] . ",1)");
+                    
+                        if ($result) {
+                            echo "<script>alert('Job completed sucussfully')</script>";
+                            // Add this block of code to change the button value
+                            echo "<script>
+                                document.querySelector('#complete_button_" . $row1['job_order_id'] . "').value = 'Completed!!!';
+                                header('refresh: 0; url=http://localhost/Dcsmsv-5.1%20-%20Copy/Customer-Dashboard/complaign.php');
+                            </script>";
+                             
+                        } else {
+                            die("invalid qury" . mysqli_error($conn));
+                        } 
+                        
+                        
+                    }                                                       
+                }
+                }
+            }
+     ?>
 
-
-                                    echo "  </tr>";
-                                }
-                            }
-
-                                ?>
 
 
                                 </tbody>
@@ -169,21 +175,22 @@ if (!$result1) {
             })
 
 
+        </script>
+        <script>
 
 
+                function logOut() {
+                // Send an HTTP POST request to the logout.php script
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', 'logout.php');
+                xhr.send();
 
-            function logOut() {
-                // Use an XMLHttpRequest to send a request to logout.php
-                var xhttp = new XMLHttpRequest();
-                xhttp.onreadystatechange = function() {
-                    if (this.readyState == 4 && this.status == 200) {
-                        // If the request is successful, redirect the user to the login page
-                        window.location.replace("../Home-Page/index.html");
-                    }
-                };
-                xhttp.open("POST", "../Home-Page/logout.php", true);
-                xhttp.send();
-            }
+                console.log('Redirecting to index.html');
+                window.location.href='../Home-Page/index.html';
+                }
+
+                
+
         </script>
 
 

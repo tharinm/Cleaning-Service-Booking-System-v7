@@ -1,6 +1,6 @@
 <?php
-// session_start();
-// print_r($_SESSION);
+session_start();
+print_r($_SESSION);
 include_once('../Home-Page/config.php');
 include('postjobvalidate.php');
 
@@ -9,7 +9,7 @@ include('postjobvalidate.php');
 // $result1=mysqli_query($conn,"SELECT cus_id from customer where user_name like '$customer' or email like '$email' ");
 // $row=mysqli_fetch_assoc($result1);
 // $_SESSION['id'] = $row['cus_id'];
-
+$cusid=$_SESSION['cus_id'];
 
 if (isset($_POST['submit'])) {
     if ($categoryErr == "" && $dateErr == "" && $noteErr == "" && $locationErr == "" && $addressErr == "") {
@@ -22,7 +22,7 @@ if (isset($_POST['submit'])) {
         $address     = mysqli_real_escape_string($conn, $_POST['address']);
 
 
-        $query1  = "INSERT INTO job_order(cus_id,job_order_address,location,job_order_date,special_note,job_order_category) VALUES (1,'$address','$location','$date','$note','$category')";
+        $query1  = "INSERT INTO job_order(cus_id,job_order_address,location,job_order_date,special_note,job_order_category) VALUES ('$cusid','$address','$location','$date','$note','$category')";
         $result1 = mysqli_query($conn, $query1);
         // print_r($_SESSION);
 

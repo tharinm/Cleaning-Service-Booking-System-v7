@@ -1,9 +1,29 @@
 <?php
-// session_start();
 include_once('../Home-Page/config.php');
+session_start();
+print_r($_SESSION);
+if (isset($_GET['username'])) {
+  $empname = $_GET['username'];
+  $_SESSION['empname'] = $empname;
+
+  $sql2=mysqli_query($conn,"SELECT emp_id from registered_employee where emp_name in('$empname') ");
+          $emp_id=mysqli_fetch_array($sql2);
+
+     if(!empty($emp_id)){
+          $empid=$emp_id['emp_id'];
+          $_SESSION['emp_id']=$empid;
+      }
+
+  }
+
+//  echo $_SESSION['empname'];
+
+
 include('validate2.php');
 
 if (isset($_POST['submit'])) {
+
+
   if ($qualificationErr ==  "" && $nicErr == "" && $emailErr == "") {
     $fname = mysqli_real_escape_string($conn, $_POST['fname']);
     $lname =  mysqli_real_escape_string($conn, $_POST['lname']);
@@ -131,7 +151,9 @@ if (isset($_POST['submit'])) {
     <div class="content">
       <nav class="navbar navbar-expand-md py-3 navbar-light bg-light ">
         <img src="image.png" class="avatar">
-        <input type="submit" class="btn btn-secondary default btn  " value="Logout" onclick="window.location.href='../Home-Page/index.html'" name="logout" />
+        <form method="POST" action="http://localhost/Dcsmsv-5.1%20-%20Copy/Home-Page/index.html">
+            <input type="submit" class="btn btn-secondary default btn  " value="Logout" onclick="logOut()" name="logout" />
+         </form>
       </nav>
       <div class="dashboard-content ms-5 px-3 pt-4">
         <div class="container mt-3 ms-2">
@@ -293,6 +315,20 @@ if (isset($_POST['submit'])) {
             $('.sidebar').removeClass('active');
           })
         </script>
+        <script>
+
+          function logOut() {
+          // Send an HTTP POST request to the logout.php script
+          var xhr = new XMLHttpRequest();
+          xhr.open('POST', 'logout.php');
+          xhr.send();
+
+          console.log('Redirecting to index.html');
+          window.location.href='../Home-Page/index.html';
+          }
+
+      </script>
+
 
 
 </body>

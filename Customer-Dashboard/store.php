@@ -1,11 +1,12 @@
 <?php
 include_once('../Home-page/config.php');
+session_start();
 
 $vacum = 400;
 $broom = 1000;
 $axe = 1200;
-
-$sql = mysqli_query($conn, 'SELECT cus_points from customer where cus_id=1');
+$cusid=$_SESSION['cus_id'];
+$sql = mysqli_query($conn, "SELECT cus_points from customer where cus_id= '$cusid'");
 $result = mysqli_fetch_array($sql);
 
 if (isset($_POST['buy'])) {
