@@ -1,18 +1,20 @@
 <?php
- session_start();
-include_once('../Home-page/config.php');
-// print_r($_SESSION);
-// echo $rating;
-// $cusid=$_SESSION['id'];
 
-$sql = mysqli_query($conn, "SELECT job_order_id from job_order where cus_id=1;");
+session_start();
+include_once('../Home-page/config.php');
+print_r($_SESSION);
+// echo $rating;
+$cusid=$_SESSION['cus_id'];
+
+$sql = mysqli_query($conn, "SELECT job_order_id,aemp_id from job_order where cus_id='$cusid' order by job_order_id desc ");
 
 $orderid = mysqli_fetch_array($sql);
 if (empty($orderid)) {
     $orderid[0] = 0;
 }
 
-$id = end($orderid);
+$oid = $orderid['job_order_id'];
+$eid = $orderid['aemp_id'];
 if (isset($_POST['submit1'])) {
 
 
@@ -26,7 +28,7 @@ if (isset($_POST['submit1'])) {
         //$reviews   = mysqli_real_escape_string($_POST['review']);
 
 
-        $query  = "INSERT INTO complain(order_id,complain_description) VALUES ($id,'$complaign')";
+        $query  = "INSERT INTO complain(order_id,complain_description) VALUES ($oid,'$complaign')";
         $result = mysqli_query($conn, $query);
         if ($result) {
             // echo "data inserted successfully";
@@ -40,11 +42,11 @@ if (isset($_POST['submit1'])) {
 if (isset($_POST['submit2'])) {
     $rate=$_POST['rating'];
 
-    $sql=mysqli_query($conn,"SELECT emp_points from registered_employee where emp_id=1");
+    $sql=mysqli_query($conn,"SELECT emp_points from registered_employee where emp_id='$eid'");
     $oldrate=mysqli_fetch_array($sql);
 
     $rating=$oldrate[0] + $rate ;
-    $result1 = mysqli_query($conn,"UPDATE registered_employee SET emp_points=$rating WHERE emp_id=1");
+    $result1 = mysqli_query($conn,"UPDATE registered_employee SET emp_points=$rating WHERE emp_id='$eid'");
     if ($result1) {
         // echo "data inserted successfully";
 
@@ -183,7 +185,7 @@ if (isset($_POST['submit2'])) {
                             <tr>
                                 <td>
                                     <lable>ORDER ID:</lable>
-                                    <input type="text" value='<?php echo $id; ?>' name="order_id" size="11" readonly />
+                                    <input type="text" value='<?php echo $oid; ?>' name="order_id" size="11" readonly />
                                 </td>
                             </tr>
                             <tr>

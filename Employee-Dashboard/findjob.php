@@ -1,6 +1,7 @@
 <?php
 include_once('../Home-page/config.php');
-
+session_start();
+print_r($_SESSION);
 // $sql1="SELECT job_order_id,job_order_category,job_order_date,location from job_order ";
 // $result=mysqli_query($conn,$sql1);
 
@@ -96,46 +97,69 @@ include_once('../Home-page/config.php');
 
             <tbody class="text-center">
 
-              <?php
-              $sql1 = "SELECT job_order_id,job_order_category,job_order_date,location from job_order ";
-              $result = mysqli_query($conn, $sql1);
-              
-              if (!$result ) {
-                die("Invalid query" . mysqli_error($conn));
-              } else {
-                while ($row = mysqli_fetch_array($result)) {
+            <?php
 
+          $empname =$_SESSION['empname'];
+        
+          $sql2=mysqli_query($conn,"SELECT emp_id from registered_employee where emp_name in('$empname') ");
+          $emp_id=mysqli_fetch_array($sql2);
+          $empid=$emp_id['emp_id'];
+          $_SESSION['emp_id']=$empid;
+
+
+          $sql1 = "SELECT job_order_id,job_order_category,job_order_date,location from job_order where status like 'Pending'";
+          $result = mysqli_query($conn, $sql1);
+
+          if (!$result ) {
+              die("Invalid query" . mysqli_error($conn));
+          } else {
+              while ($row = mysqli_fetch_array($result)) {
                   echo " <tr>";
                   echo " <td> $row[job_order_id] </td>";
                   echo "<td>$row[job_order_category]</td>";
                   echo "<td>$row[job_order_date]</td>";
                   echo "<td>$row[location]</td>";
-                  echo "<td> ";
-                  echo "<input type='submit' class='btn btn-success' name='accept' value='Accept' id='accept'>";
-
+                  echo "<td>  
+                       <form method='post'>
+                         <input type='submit' class='btn btn-success' name='accept_" . $row['job_order_id'] . "' value='Accept' id='accept'>
+                       </form>
+                        </td>";
                   echo " </tr>";
-                }
+
+                  if (isset($_POST['accept_' . $row['job_order_id']])) {
+                      $accept = "UPDATE job_order set status='Accept', aemp_id='$empid' where job_order_id='" . $row['job_order_id'] . "'";
+                      $result1 = mysqli_query($conn, $accept);
+
+                      if ($result1) {
+                          $result2 = mysqli_query($conn, "INSERT INTO job_accepted_emp(a_emp_id,a_order_id) VALUES('$empid'," . $row['job_order_id'] . ")");
+                          if ($result2) {
+                              echo "<script>alert('Job Accepted Successfully');</script>";
+                              // header("refresh: 0; http://localhost/Dcsmsv-5.1%20-%20Copy/Employee-Dashboard/findjob.php");
+                          }
+                      }
+       
+
+                    }
               }
+            }
 
-                if (isset($_POST['accept'])) {
-                  $accept = "UPDATE job_order set status='Accept' where job_order_id='1'";
-                  $result1 = mysqli_query($conn, $accept);
+              $result8=mysqli_query($conn,"SELECT emp_id from registered_employee where emp_points > 100 order by emp_id limit 10");
+              
+              $array = array();
 
-                  if ($result) {
-                    $order_id = mysqli_insert_id($conn);
+                  while ($topempid=mysqli_fetch_assoc($result8)) {
+                      $array[] = $topempid;
                   }
 
-                  $result2 = mysqli_query($conn, "INSERT INTO job_accepted_emp(a_emp_id,a_order_id)VALUES(1,$order_id+1)");
+                  $column_array = array_column($array, 'emp_id');
 
+                  // print_r($column_array[1]);
+                
+             for($i =0;$i<2;$i++){
+                if($column_array[$i]==$empid){
 
-                  if ($result1 && $result2) {
-                    echo "<script>alert('Job Accepted');</script>";
-                  }
-                }
-
-
-
-                $result3 = mysqli_query($conn,"SELECT rejected_order_id,category,date,time FROM emp_reject_orders WHERE rejected_order_id=1");
+            
+                $result3 = mysqli_query($conn,"SELECT rejected_order_id,category,date,time FROM emp_reject_orders where status like 'pending' ");
                 
                 if (!$result3 ) {
                   die("Invalid query" . mysqli_error($conn));
@@ -147,31 +171,34 @@ include_once('../Home-page/config.php');
                     echo "<td>$row2[category]</td>";
                     echo "<td>$row2[date]</td>";
                     echo "<td>$row2[time]</td>";
-                    echo "<td> ";
-                    echo "<input type='submit' class='btn btn-success' name='accept1' value='Accept' id='accept1'>";
-  
+                    echo "<td>  
+                       <form method='post'>
+                    <input type='submit' class='btn btn-success' name='accept1_" . $row2['rejected_order_id'] . "' value='Accept' id='accept1'>
+                    </form>
+                        </td>";
                     echo " </tr>";
-                  }
-                }  
+                  
+                  
               
-                if (isset($_POST['accept1'])) {
-                  $accept1 = "UPDATE emp_reject_orders set status='Accept' where rejected_order_id='1'";
+                if (isset($_POST['accept1_' . $row2['rejected_order_id'] . ''])) {
+                  $accept1 = "UPDATE emp_reject_orders set status='Accept', aemp_id='$empid' where rejected_order_id='" . $row2['rejected_order_id'] . "' ";
                   $result6 = mysqli_query($conn, $accept1);
+                  
+                  if ($result6){
+                    
 
-                  if ($result6) {
-                    $r_order_id = mysqli_insert_id($conn);
+                  $result7 = mysqli_query($conn, "INSERT INTO job_accepted_emp(a_emp_id,a_order_id)VALUES('$empid'," . $row2['rejected_order_id'] . ")");
+
                   }
-
-                  $result7 = mysqli_query($conn, "INSERT INTO job_accepted_emp(a_emp_id,a_order_id)VALUES(1,$r_order_id+1)");
-
-
                   if ($result6 && $result7) {
-                    echo "<script>alert('Job Accepted');</script>";
+                    echo "<script>alert('Job Accepted Successfully');</script>";
+                    header("refresh: 0; http://localhost/Dcsmsv-5.1%20-%20Copy/Employee-Dashboard/findjob.php");
                   }
                 }
 
-
-              ?>
+              }
+            }
+           }} ?>
             </tbody>
           </table>
         </form>

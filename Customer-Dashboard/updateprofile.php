@@ -1,8 +1,27 @@
 <?php
+session_start();
 include('../Home-page/config.php');
 
+if (isset($_GET['username']))
+ {
+  $username = $_GET['username'];
+  $_SESSION['cusname'] = $username;
 
+    $sql2=mysqli_query($conn,"SELECT cus_id from customer where user_name in('$username')");
+    $cusid=mysqli_fetch_array($sql2);
+    if(!$sql2){
+        die("Invalid query" . mysqli_error($conn));
+    }else{
+        $_SESSION['cus_id']=$cusid['cus_id'];
+        
+    }
+  }
+  $cusid=$_SESSION['cus_id'];
+  print_r($_SESSION);
+
+  echo $cusid;
 if (isset($_POST['submit'])) {
+
 
 
   $firstname = mysqli_real_escape_string($conn, $_POST['first']);
@@ -20,7 +39,7 @@ if (isset($_POST['submit'])) {
   // $row = mysqli_fetch_assoc($result1);
   // $_SESSION['id'] = $row['cus_id'];
   // print_r($_SESSION);
-  $sql1 = "UPDATE customer SET first_name='$firstname',last_name='$lastname',address='$address',nic='$nic',postal_code=$postalcode WHERE cus_id=1";
+  $sql1 = "UPDATE customer SET first_name='$firstname',last_name='$lastname',address='$address',nic='$nic',postal_code=$postalcode WHERE cus_id=$cusid ";
   $results = mysqli_query($conn, $sql1);
 
   if (!$results) {
@@ -69,7 +88,7 @@ if (isset($_POST['submit'])) {
 </head>
 
 <body>
-
+    
   <div class="main-container d-flex">
     <div class="sidebar " id="side_nav">
       <div class="header-box px-2 pt-3 pb-4 d-flex justify-content-between">

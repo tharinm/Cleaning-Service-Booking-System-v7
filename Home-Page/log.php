@@ -1,16 +1,16 @@
 <?php
-
+session_start();
 include('config.php');
 
-// session_start();
+
 $erorrs = [];
-// $_SESSION['id']=1;
 
-
+// include('sessions.php');
 
 if (!isset($_SESSION['login'])) {
     if (isset($_POST['login'])) {
 
+    
         $username = $_POST['username'];
         $password  = $_POST['password'];
         $role = $_POST['role'];
@@ -33,12 +33,12 @@ if (!isset($_SESSION['login'])) {
                         //   $_SESSION['login'] = true;
                         // $_SESSION['name'] = $fetch['name'];
                         echo "<script> alert('Login Successfully');</script>";
-                        header("refresh: 0; http://localhost/Dcsmsv-5.1/Customer-Dashboard/updateprofile.php");
+                        header("refresh: 0; http://localhost/Dcsmsv-5.1%20-%20Copy/Customer-Dashboard/updateprofile.php?username=".$username);
                     } elseif ($fetch['v_user'] == 1 && $fetch['role'] == 'employee') {
                         //  $_SESSION['login'] = true;
                         // $_SESSION['name'] = $fetch['name'];
                         echo "<script> alert('Login Successfully');</script>";
-                        header("refresh: 0; http://localhost/Dcsmsv-5.1/Employee-Dashboard/updated.php");
+                        header("refresh: 0; http://localhost/Dcsmsv-5.1%20-%20Copy/Employee-Dashboard/updated.php?username=".$username);
                     } elseif ($fetch['v_user'] == 1 && $fetch['role'] == 'admin') {
                         //  $_SESSION['login'] = true;
                         // $_SESSION['name'] = $fetch['name'];
