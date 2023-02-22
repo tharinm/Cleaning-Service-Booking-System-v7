@@ -1,6 +1,11 @@
  <?php
+  session_start();
   include_once('../Home-page/config.php');
+  if (isset($_GET['id'])) 
+  $_SESSION['session_id']= $_GET['id']; 
 
+  if (isset($_GET['cusid']))
+  $_SESSION['cus_id']= $_GET['cusid'];
   ?>
  <!DOCTYPE html>
  <html lang="en">
@@ -15,15 +20,13 @@
    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
    <link rel="stylesheet" href="CSS/history.css">
-
-   <style>
+   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">   <style>
      .navbar {
        display: flex;
        justify-content: flex-end;
        gap: 10px;
        align-items: center;
        padding: 5px;
-
 
      }
 
@@ -42,30 +45,27 @@
          <button class="btn d-md-none d-block close-btn px-1 py-0 text-white"><i class="fa-solid fa-bars-staggered"></i></button>
        </div>
 
-
        <ul class="list-unstyled px-2 ">
-         <li class=""><a href="findjob.php" class="text-decoration-none px-3 py-3 d-block">FIND JOB</a></li>
-         <li class=""><a href="pending.php" class="text-decoration-none px-3 py-3 d-block">MY WORK</a></li>
-         <!-- <li class=""><a href="works.php" class="text-decoration-none px-3 py-3 d-block">YOUR WORKS</a></li> -->
-         <li class=""><a href="resheduled.php" class="text-decoration-none px-3 py-3 d-block">RESHEDULED</a></li>
-         <li class=""><a href="map.html" class="text-decoration-none px-3 py-3 d-block">VIEW ON MAP</a></li>
-         <li class=""><a href="cancel.php" class="text-decoration-none px-3 py-3 d-block">CANCEL JOB</a></li>
-         <li class=""><a href="store.php" class="text-decoration-none px-3 py-3 d-block">REWARD</a></li>
-         <li class="active"><a href="history.php" class="text-decoration-none px-3 py-3 d-block">HISTORY</a></li>
-
-         <li class=""><a href="updated.php" class="text-decoration-none px-3 py-3 d-block">UPDATE PROFILE</a></li>
+         
+        <?php echo "<li class=''><a href='findjob.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."' class='text-decoration-none px-3 py-3 d-block'>FIND JOB</a></li>"; ?>
+        <?php echo "<li class=''><a href='mywork.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."' class='text-decoration-none px-3 py-3 d-block'>MY WORK</a></li>"; ?>
+        <?php echo "<li class=''><a href='resheduled.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."' class='text-decoration-none px-3 py-3 d-block'>RESHEDULED</a></li>"; ?>
+        <?php echo "<li class=''><a href='map.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."' class='text-decoration-none px-3 py-3 d-block'>VIEW ON MAP</a></li>"; ?>
+        <?php echo "<li class=''><a href='cancel.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."' class='text-decoration-none px-3 py-3 d-block'>CANCEL JOB</a></li>"; ?>
+        <?php echo "<li class=''><a href='store.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."' class='text-decoration-none px-3 py-3 d-block'>REWARDS</a></li>"; ?>
+        <?php echo "<li class='active'><a href='history.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."' class='text-decoration-none px-3 py-3 d-block'>HISTORY</a></li>"; ?>
+        <?php echo "<li class=''><a href='updated.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."' class='text-decoration-none px-3 py-3 d-block'>UPDATE PROFILE</a></li>"; ?>
 
        </ul>
 
-
      </div>
      <div class="content">
-       <nav class="navbar navbar-expand-md py-3 navbar-light bg-light ">
-         <img src="image.png" class="avatar">
-         <input type="submit" class="btn btn-secondary default btn  " value="Logout" onclick="window.location.href='../Home-Page/index.html'" name="logout" />
-       </nav>
-
-
+     <nav class="navbar navbar-expand-md py-3 navbar-light bg-light ">
+        <img src="image.png" class="avatar">
+          <form method="POST" action="http://localhost/Dcsmsv-5.1%20-%20Copy/Home-Page/index.html">
+            <input type="submit" class="btn btn-secondary default btn" value="Logout" onclick="logOut()" name="logout" />
+          </form>
+      </nav>
 
        <div class="dashboard-content ms-5 px-3 pt-4">
 
@@ -80,33 +80,42 @@
            </thead>
            <tbody class="text-center">
              <?php
-              $result2 = mysqli_query($conn, "SELECT * from emp_payment,job_order ");
-              $row1 = mysqli_fetch_assoc($result2);
+              $eid=$_SESSION['cus_id'];
+              $result2 = mysqli_query($conn, "SELECT * from emp_payment
+                        Join job_order ON emp_payment.order_id=job_order.job_order_id
+                        where emp_id=$eid");
+              $total=0;
 
-              if (empty($row1['balance'])) {
+              if ($result2) 
+              { 
+                
+                while ($pay = mysqli_fetch_assoc($result2))
+                {
+                   
+                    $total+=$pay['balance'];
+                    echo " <tr>";
+                    echo " <td>$pay[order_id] </td>";
+                    echo "<td>$pay[job_order_category]</td>";
+                    echo "<td>$pay[job_order_date]</td>";
+                    echo "<td>$pay[balance]</td>";
+                    echo "<td>";
+
+                }
+              }else{
+
                 echo "<script>alert('please go to mywork and click on the complete button');</script>";
-              } else {
-
-                echo " <tr>";
-                echo " <td> $row1[order_id] </td>";
-                echo "<td>$row1[job_order_category]</td>";
-                echo "<td>$row1[job_order_date]</td>";
-                echo "<td>$row1[balance]</td>";
-                echo "<td>";
               }
+
               ?>
            </tbody>
-         </table>
-
+          </table>
 
          <div class="row">
            <div class="col-12">
 
-             <p class="text-center lead">Total Balance Rs <?php if (empty($row1['balance'])) {
-                                                            echo 0;
-                                                          } else {
-                                                            echo $row1['balance'];
-                                                          } ?></p>
+             <p class="text-center lead">Total Balance Rs <?php 
+                                                            echo $total;
+                                                           ?></p>
            </div>
          </div>
 
@@ -122,7 +131,8 @@
           if (isset($_POST['withdraw'])) {
             $payment = $_POST['bankacc'];
             $amount = $_POST['amount'];
-            $sql = mysqli_query($conn, "INSERT INTO emp_withdrawal_request(bank_acc,amount) VALUES ($payment,$amount)");
+            $sql = mysqli_query($conn, "INSERT INTO emp_withdrawal_request(emp_id,bank_acc,amount) VALUES ($eid,$payment,$amount)");
+            echo "<script>alert('your withdrawal request has been send successfully');</script>";
           }
           ?>
 
@@ -138,7 +148,7 @@
                <div class="modal-body">
                  <form method="POST">
                    <input type="text" class="form-control modal-md" name="bankacc">
-                   <lable>Amount :</lable> <input type="text" class="form-control modal-md" name="amount" value="<?php echo $row1['balance']; ?> ">
+                   <lable>Amount :</lable> <input type="text" class="form-control modal-md" name="amount" value="<?php echo $total; ?> ">
                </div>
 
                <div class="modal-footer">
@@ -148,9 +158,6 @@
              </div>
            </div>
          </div>
-
-
-
 
        </div>
 
@@ -178,7 +185,19 @@
          $('.sidebar').removeClass('active');
        })
      </script>
+     <script>
 
+        function logOut() {
+        // Send an HTTP POST request to the logout.php script
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', 'logout.php');
+        xhr.send();
+
+        console.log('Redirecting to index.html');
+        window.location.href='../Home-Page/index.html';
+        }
+
+      </script>
 
  </body>
 

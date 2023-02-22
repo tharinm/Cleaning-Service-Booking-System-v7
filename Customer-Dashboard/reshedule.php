@@ -1,39 +1,13 @@
 <?php
-
+session_start();
 include_once('../Home-page/config.php');
-if (isset($_POST['cancel'])) {
-    $sql2 = "INSERT INTO cancel_order(order_id,category,date) SELECT  job_order_id,job_order_category,job_order_date from job_order where job_order_id=1";
-    $result2 = mysqli_query($conn, $sql2);
+if (isset($_GET['id'])) 
+    $_SESSION['session_id'] = $_GET['id'];
+if (isset($_GET['cusid']))
+    $_SESSION['cus_id'] = $_GET['cusid'];
+if (isset($_GET['oid']))
+    $_SESSION['order_id']=$_GET['oid'];
 
-    $sql4 = "INSERT INTO refunds(cus_id) SELECT cus_id from customer where cus_id=1";
-    $result4 = mysqli_query($conn, $sql4);
-
-    $result3 = mysqli_query($conn, "DELETE from job_order where job_order_id =1 ");
-
-    if (!$result2 && !$result3) {
-        die("invalid query" . mysqli_error($conn));
-    } else {
-        echo "<script>alert('job order cancelled succeesfully')</script>";
-    }
-}
-
-if (isset($_POST['submit2'])) {
-
-    $date = $_POST['date'];
-    $time = $_POST['time'];
-    $category = $_POST['category_name'];
-    $result4 = mysqli_query($conn, "INSERT INTO reshedule(re_date,re_time,category)VALUES('$date','$time','$category')");
-
-    if (!$result4) {
-        die("invalid" . mysqli_error($conn));
-    } else {
-        echo "<script>alert('job order rescheduled succeesfully')</script>";
-    }
-}
-
-
-?>
-<?php
 $status = "";
 $msg = "";
 //$city="";
@@ -372,26 +346,27 @@ if ($result['cod'] == 200) {
                 <button class="btn d-md-none d-block close-btn px-1 py-0 text-white"><i class="fa-solid fa-bars-staggered"></i></button>
             </div>
 
-
             <ul class="list-unstyled px-2 ">
-                <li class=""><a href="postjob.php" class="text-decoration-none px-3 py-3 d-block">POST JOB</a></li>
-                <li class=""><a href="orderstatus.php" class="text-decoration-none px-3 py-3 d-block">ORDER STATUS</a></li>
+                <?php echo "<li class=''><a href='postjob.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."&&oid=".$_SESSION['order_id']."' class='text-decoration-none px-3 py-3 d-block'>POST JOB</a></li>"; ?>
+                <?php echo "<li class=''><a href='pendingorders.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."&&oid=".$_SESSION['order_id']."' class='text-decoration-none px-3 py-3 d-block'>PENDING ORDERS</a></li>"; ?>
+                <?php echo "<li class=''><a href='orderstatus.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."&&oid=".$_SESSION['order_id']."' class='text-decoration-none px-3 py-3 d-block'>ORDER STATUS</a></li>"; ?>
                 <!-- <li class=""><a href="payment.html" class="text-decoration-none px-3 py-3 d-block">PAYMENT</a></li> -->
-                <li class="active"><a href="reshedule.php" class="text-decoration-none px-3 py-3 d-block">RESHEDULE</a></li>
-                <li class=""><a href="myorders.php" class="text-decoration-none px-3 py-3 d-block">MY ORDERS</a></li>
-                <li class=""><a href="complaign.php" class="text-decoration-none px-3 py-3 d-block">COMPLAIN</a></li>
-                <li class=""><a href="updateprofile.php" class="text-decoration-none px-3 py-3 d-block">UPDATE PROFILE</a></li>
-                <li class=""><a href="store.php" class="text-decoration-none px-3 py-3 d-block">REWARDS</a></li>
-                <li class=""><a href="help.html" class="text-decoration-none px-3 py-3 d-block">HELP</a></li>
+                <?php echo "<li class='active'><a href='reshedule.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."&&oid=".$_SESSION['order_id']."' class='text-decoration-none px-3 py-3 d-block'>RESHEDULE</a></li>"; ?>
+                <?php echo "<li class=''><a href='myorders.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."&&oid=".$_SESSION['order_id']."' class='text-decoration-none px-3 py-3 d-block'>MY ORDERS</a></li>"; ?>
+                <?php echo "<li class=''><a href='complaign.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."&&oid=".$_SESSION['order_id']."' class='text-decoration-none px-3 py-3 d-block'>COMPLAIN</a></li>"; ?>
+                <?php echo "<li class=''><a href='updateprofile.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."&&oid=".$_SESSION['order_id']."' class='text-decoration-none px-3 py-3 d-block'>UPDATE PROFILE</a></li>"; ?>
+                <?php echo "<li class=''><a href='store.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."&&oid=".$_SESSION['order_id']."' class='text-decoration-none px-3 py-3 d-block'>REWARDS</a></li>"; ?>
+                <?php echo "<li class=''><a href='help.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."&&oid=".$_SESSION['order_id']."' class='text-decoration-none px-3 py-3 d-block'>HELP</a></li>"; ?>
 
             </ul>
-
 
         </div>
         <div class="content">
             <nav class="navbar navbar-expand-md py-3 navbar-light bg-light ">
                 <img src="image.png" class="avatar">
-                <input type="submit" class="btn btn-secondary default btn  " value="Logout" onclick="window.location.href='../Home-Page/index.html'" name="logout">
+                <form method="POST" action="http://localhost/Dcsmsv-5.1%20-%20Copy/Home-Page/index.html">
+                       <input type="submit" class="btn btn-secondary default btn" value="Logout" onclick="logOut()" name="logout" />
+                </form>
             </nav>
             <div class="dashboard-content ms-5 px-3 pt-4 d-flex  flex-wrap">
                 <div class="details w-50">
@@ -404,20 +379,46 @@ if ($result['cod'] == 200) {
                                     <td scope="col">Details</td>
                                     <td scope="col">Action</td>
                                 </tr>
+                            </div>  
+                            
                             </div>
-                            <?php
+                                <?php if ($status == "yes") { ?>
+                                    <article class="widget ms-5">
+                                        <div class="weatherIcon">
+                                            <img src="http://openweathermap.org/img/wn/<?php echo $result['weather'][0]['icon'] ?>@4x.png" />
+                                        </div>
+                                        <div class="weatherInfo">
+                                            <div class="temperature">
+                                                <span><?php echo round($result['main']['temp'] - 273.15) ?>°</span>
+                                            </div>
+                                            <div class="description mr45">
+                                                <div class="weatherCondition"><?php echo $result['weather'][0]['main'] ?></div>
+                                                <div class="place"><?php echo $result['name'] ?></div>
+                                            </div>
+                                            <div class="description wind">
+                                                <div class="weatherCondition">Wind</div>
+                                                <div class="place"><?php echo $result['wind']['speed'] ?> M/H</div>
+                                            </div>
+                                        </div>
+                                        <div class="date">
+                                            <?php echo date('d M', $result['dt']) ?>
 
-                            $query = mysqli_query($conn, "SELECT  job_order_id,job_order_category,job_order_date,emp_name,emp_filename,emp_status from job_order,registered_employee where job_order_id=1 and emp_id=1");
-                            /* $query3=mysqli_query($conn,"SELECT o1.job_order_id,o1.job_order_category,o1.job_order_date,jae1.a_emp_id,re1.emp_name,re1.emp_filename,re1.emp_status
-                         FROM Job_accepted_emp AS jae1
-                         INNER JOIN job_order AS o1 ON jae1.a_order_id=o1.job_order_id
-                         INNER JOIN registered_employee AS re1 ON o1.emp_id =re1.emp_id");;*/
-                            //  $numrow = mysqli_num_rows($query);	 = 
-
-                            // if($numrow!=0){
-                            while ($row = mysqli_fetch_assoc($query)) {
-
-                            ?>
+                                        </div>
+                                    </article>
+                                <?php } ?>
+                                </div>
+    <?php
+                    $order_id = mysqli_real_escape_string($conn, $_SESSION['order_id']);
+                    $query = mysqli_query($conn, "SELECT job_order.job_order_id,job_order.job_order_category,registered_employee.emp_name
+                    from job_order
+                    JOIN registered_employee ON job_order.aemp_id = registered_employee.emp_id 
+                    where job_order_id='$order_id'");
+                                
+                while ($row = mysqli_fetch_assoc($query)) 
+                {   
+                    $sql5=mysqli_query($conn,"SELECT re_status from reshedule where order_id=$row[job_order_id]");
+                    $status=mysqli_fetch_assoc($sql5);
+                     ?>
                                 <div class="col-md-4 mb-4">
                                     <tr>
                                     </tr>
@@ -427,87 +428,145 @@ if ($result['cod'] == 200) {
                 <tbody class="text-center">
                     <div class="col-md-4 mb-4">
                         <tr>
-                            <?php
-                            ?>
                             <td scope="row"><?php echo $row['job_order_id']; ?></td>
                             <td><?php echo $row['emp_name']; ?></td>
                             <td><?php echo $row['job_order_category']; ?></td>
                             <td><input type="submit" class="btn btn-danger text-white btn-sm col-sm-6" name="cancel" value="Cancel"></td>
                         </tr>
+                        <?php
+                                 if (isset($_POST['cancel'])) 
+                                 {
+                     
+                                     $cus_id = mysqli_real_escape_string($conn, $_SESSION['cus_id']);
+                                     $order_id = mysqli_real_escape_string($conn, $_SESSION['order_id']);
+                     
+                                     $sql2 = "INSERT INTO cancel_order(order_id,aemp_id,category,date) SELECT  job_order_id,aemp_id,job_order_category,job_order_date from job_order where job_order_id='$order_id'";
+                                     $result2 = mysqli_query($conn, $sql2);
+                     
+                                     $sql4 = "INSERT INTO refunds(cus_id)VALUES('$cus_id') ";
+                                     $result4 = mysqli_query($conn, $sql4);
+                     
+                                     $result3 = mysqli_query($conn, "DELETE from job_order where job_order_id='$order_id' ");
+                     
+                                     if (!$result2 && !$result3) 
+                                         die("invalid query" . mysqli_error($conn));
+                                     else 
+                                         echo "<script>alert('job order cancelled succeesfully')</script>";
+                                         header("refresh: 0; http://localhost/Dcsmsv-5.1%20-%20Copy/Customer-Dashboard/reshedule.php");
+                                 }
+
+                                 if (isset($_POST['submit2'])) 
+                                 {                 
+                                     $date = mysqli_real_escape_string($conn,$_POST['date']);
+                                     $time = mysqli_real_escape_string($conn,$_POST['time']);
+                                     $category = mysqli_real_escape_string($conn,$_POST['category_name']);
+                                     $result4 = mysqli_query($conn, "INSERT INTO reshedule(order_id,re_date,re_time,category)VALUES($order_id,'$date','$time','$category')");
+                     
+                                     if (!$result4) 
+                                         die("invalid" . mysqli_error($conn));
+                                     else 
+                                         echo "<script>alert('job order rescheduled succeesfully')</script>";
+                     
+                                 } ?>
 
                         <tr>
-                            <th scope="col" colspan="3">Resheduled Details</th>
+                            <th></th>
                         </tr>
-                        <?php
+                        <tr>
+                            <th></th>
+                        </tr>
+                        <tr>
+                            <th scope="col" colspan="3">Resheduled Details :<?php if(!empty($status['re_status']))  echo " $status[re_status]";?> </th>
+                        </tr>
+            <?php
+                $result7= mysqli_query($conn,"SELECT re_status from reshedule where order_id='$order_id'");
+                $row7=mysqli_fetch_assoc($result7);
 
-                                $result5 = mysqli_query($conn, "SELECT re_id,re_date,re_time,category,re_status,emp_name,emp_filename,emp_status,filename FROM reshedule,registered_employee,image WHERE re_id=1 and emp_id=1 and id=1");
-                                
-                                
-                                if ($result5) {
+                if(!$result7)
+                {
+                        die("invalid query".mysqli_error($conn));
 
-                                    // if($numrow!=0){
-                                    while ($row5 = mysqli_fetch_assoc($result5)) {
+                }else {  
+                        $result5 = mysqli_query($conn, "SELECT order_id,re_date,re_time,category,re_status,
+                        emp_name,emp_filename,emp_status,emp_filename 
+                        FROM reshedule
+                        JOIN registered_employee ON reshedule.aemp_id = registered_employee.emp_id
+                        WHERE order_id='$order_id' ");
 
+                        while ($row5 = mysqli_fetch_assoc($result5)) 
+                        {
                         ?>
+                                    <div class="col-md-4 mb-4">
+                                        <tr>
+                                            <td colspan="3"></td>
+                                            <td scope="col " class="text-success align-right" ><?php echo $row5['re_status'];  ?></td>
+                                        </tr>
+                                    </div>
+                            <tbody class="text-center">
+
                                 <div class="col-md-4 mb-4">
                                     <tr>
-                                        <td colspan="3"></td>
-                                        <td scope="col " class="text-success align-right" ><?php echo $row5['re_status'];  ?></td>
+                                        <td scope="row"><?php echo $row5['order_id']; ?></td>
+                                        <td><?php echo $row5['category']; ?></td>
                                     </tr>
                                 </div>
-                <tbody class="text-center">
+                                <div class="col-md-4 mb-4">
+                                    <tr>
+                                        <td scope="col"></td>
+                                        <td scope="col"></td>
+                                    </tr>
+                                </div>
 
-                    <div class="col-md-4 mb-4">
-                        <tr>
-                            <td scope="row"><?php echo $row5['re_id']; ?></td>
-                            <td><?php echo $row5['category']; ?></td>
-                        </tr>
-                    </div>
-                    <div class="col-md-4 mb-4">
-                        <tr>
-                            <td scope="col"></td>
-                            <td scope="col"></td>
-                        </tr>
-                    </div>
-                    <?php       
-                                
+                            <?php if($row5['re_status'] == 'accept') 
+                            { ?>
 
-                                 if($row5['re_status'] == 'accept') { ?>
-                        <div class="col-md-4 mb-4">
-                            <tr>
-                                <td scope="col" colspan="3">Employee Details</td>
-                                
-                            </tr>
-                        </div>
+                                <div class="col-md-4 mb-4">
+                                    <tr>
+                                        <td scope="col" colspan="3">Employee Details</td>
+                                        
+                                    </tr>
+                                </div>
 
-                        <div class="col-md-4 mb-4">
-                            <tr>
-                                <td scope="row"><?php echo $row5['emp_name']; ?></td>
-                                <td colspan="2"><?php echo $row5['emp_status']; ?></td>
+                                <div class="col-md-4 mb-4">
+                                    <tr>
+                                        <td scope="row"><?php echo $row5['emp_name']; ?></td>
+                                        <td colspan="2"><?php echo $row5['emp_status']; ?></td>
 
-                            </tr>
-                            <tr>
-                                <td><img src="../Employee-Dashboard/image/<?php echo $row5['filename']; ?>" width='150' height='100'></td>
-                                <td><?php echo $row5['re_date']; ?></td>
-                                <td><input type="submit" value="Accept" name="accept" class="btn btn-success  btn-sm col-sm-9"></td>
+                                    </tr>
+                                    <tr>
+                                        <td><img src="../Employee-Dashboard/image/<?php echo $row5['emp_filename']; ?>" width='150' height='100'></td>
+                                        <td><?php echo $row5['re_date']; echo"<br> ".$row5['re_time'];?></td>
+                                        <td><input type="submit" value="Accept" name="accept" class="btn btn-success  btn-sm col-sm-9"></td>
 
-                            </tr>
-                        </div>
+                                    </tr>
+                                </div>
                         
-                <?php }else if($row5['re_status'] == 'rejected'){
-                                $result6 = mysqli_query($conn, "SELECT rejected_order_id,date,time,category,status,emp_name,emp_filename,emp_status,filename FROM emp_reject_orders,registered_employee,image WHERE rejected_order_id=1 and emp_id=1 and id=1");
-                            
-                                $row6=mysqli_fetch_assoc($result6);
+             <?php          }
+                        }
+                    }
 
-                                if($row6['status']=='Accept'){ ?>
+                    if(!empty($row7['re_status']) && $row7['re_status']=='rejected')
+                    {                            
+                                $result6 = mysqli_query($conn, "SELECT emp_reject_orders.rejected_order_id,emp_reject_orders.aemp_id,emp_reject_orders.date,emp_reject_orders.time,emp_reject_orders.category,emp_reject_orders.status,
+                                registered_employee.emp_name,registered_employee.emp_filename,registered_employee.emp_status,registered_employee.emp_filename 
+                                FROM emp_reject_orders
+                                JOIN registered_employee ON emp_reject_orders.aemp_id=registered_employee.emp_id
+                                WHERE rejected_order_id='$order_id'");
+
+                                $row6=mysqli_fetch_assoc($result6);
+                                if (!$result6)
+                                    die("invalid".mysqli_error($conn));
+
+                                if(!empty($row6) && $row6['status']=='Accept')
+                                { ?>
                                         
 
                                         <div class="col-md-4 mb-4">
-                            <tr>
-                                <td scope="col" colspan="3">Employee Details</td>
-                                <td scope="col " class="text-success align-right" ><?php echo $row6['status'];  ?></td>
-                            </tr>
-                        </div>
+                                <tr>
+                                    <td scope="col" colspan="3">Employee Details</td>
+                                    <td scope="col " class="text-success align-right" ><?php echo $row6['status'];  ?></td>
+                                </tr>
+                            </div>
 
                         <div class="col-md-4 mb-4">
                             <tr>
@@ -516,23 +575,16 @@ if ($result['cod'] == 200) {
 
                             </tr>
                             <tr>
-                                <td><img src="../Employee-Dashboard/image/<?php echo $row6['filename']; ?>" width='150' height='100'></td>
+                                <td><img src="../Employee-Dashboard/image/<?php echo $row6['emp_filename']; ?>" width='150' height='100'></td>
                                 <td><?php echo $row6['date'];  echo"<br> ".$row6['time'];?></td>
                                 <td><input type="submit" value="Accept" name="accept1" class="btn btn-success  btn-sm col-sm-9"></td>
 
                             </tr>
-                        </div>
+                        </div>              
+            <?php
+                     } 
+                } ?>
 
-
-                                        
-                            <?php
-                                }                                
-                        
-
-                                 }
-                     
-                 }
-             } ?>
             </table>
             </form>
 
@@ -577,32 +629,7 @@ if ($result['cod'] == 200) {
 
 
 <?php  }  ?>
-</div>
-<?php if ($status == "yes") { ?>
-    <article class="widget ms-5">
-        <div class="weatherIcon">
-            <img src="http://openweathermap.org/img/wn/<?php echo $result['weather'][0]['icon'] ?>@4x.png" />
-        </div>
-        <div class="weatherInfo">
-            <div class="temperature">
-                <span><?php echo round($result['main']['temp'] - 273.15) ?>°</span>
-            </div>
-            <div class="description mr45">
-                <div class="weatherCondition"><?php echo $result['weather'][0]['main'] ?></div>
-                <div class="place"><?php echo $result['name'] ?></div>
-            </div>
-            <div class="description wind">
-                <div class="weatherCondition">Wind</div>
-                <div class="place"><?php echo $result['wind']['speed'] ?> M/H</div>
-            </div>
-        </div>
-        <div class="date">
-            <?php echo date('d M', $result['dt']) ?>
 
-        </div>
-    </article>
-<?php } ?>
-</div>
 
 </div>
 </div>
@@ -629,6 +656,19 @@ if ($result['cod'] == 200) {
         $('.sidebar').removeClass('active');
     })
 </script>
+    <script>
+
+                function logOut() {
+                        // Send an HTTP POST request to the logout.php script
+                        var xhr = new XMLHttpRequest();
+                        xhr.open('POST', 'logout.php');
+                        xhr.send();
+
+                        console.log('Redirecting to index.html');
+                        window.location.href='../Home-Page/index.html';
+                }
+
+        </script>
 
 
 </body>

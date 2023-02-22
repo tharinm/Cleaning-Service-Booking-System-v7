@@ -1,10 +1,9 @@
 <?php
+session_start();
 include_once('../Home-page/config.php');
-$sql = "SELECT complain_id,order_id,complain_description FROM complain";
-$result = mysqli_query($conn, $sql);
-if (!$result) {
-    die("Invalid query" . mysqli_error($conn));
-} else {
+
+if (isset($_GET['id'])) 
+    $_SESSION['session_id'] = $_GET['id']; 
 
 ?>
 
@@ -36,100 +35,109 @@ if (!$result) {
 
 
                 <ul class="list-unstyled px-2 ">
-                    <li class=""><a href="registeremployee.php" class="text-decoration-none px-3 py-3 d-block">REGISTER EMPLOYEE</a></li>
-                    <li class=""><a href="payment.php" class="text-decoration-none px-3 py-3 d-block">PAYMENT</a></li>
-                    <li class=""><a href="work.php" class="text-decoration-none px-3 py-3 d-block">WORKS</a></li>
-                    <li class=""><a href="emplyoeelist.php" class="text-decoration-none px-3 py-3 d-block">EMPLOYEE LIST</a></li>
-                    <li class=""><a href="userlist.php" class="text-decoration-none px-3 py-3 d-block">USER LIST</a></li>
-                    <li class="active"><a href="complaign.php" class="text-decoration-none px-3 py-3 d-block">COMPLAINS</a></li>
-
+                    <?php echo "<li class=''><a href='registeremployee.php?id=".$_SESSION['session_id']."' class='text-decoration-none px-3 py-3 d-block'>REGISTER EMPLOYEE</a></li>" ?>
+                    <?php echo "<li class=''><a href='payment.php?id=".$_SESSION['session_id']."' class='text-decoration-none px-3 py-3 d-block'>PAYMENT</a></li> " ?>
+                    <?php echo "<li class=''><a href='work.php?id=".$_SESSION['session_id']."' class='text-decoration-none px-3 py-3 d-block'>WORKS</a></li> "?>
+                    <?php echo "<li class=''><a href='emplyoeelist.php?id=".$_SESSION['session_id']."' class='text-decoration-none px-3 py-3 d-block'>EMPLOYEE LIST</a></li> "?>
+                    <?php echo "<li class=''><a href='userlist.php?id=".$_SESSION['session_id']."' class='text-decoration-none px-3 py-3 d-block'>USER LIST</a></li>" ?>
+                    <?php echo "<li class='active'><a href='complaign.php?id=".$_SESSION['session_id']."' class='text-decoration-none px-3 py-3 d-block'>COMPLAINS</a></li>" ?>
 
                 </ul>
 
 
             </div>
             <div class="content">
-                <nav class="navbar navbar-expand-md py-3 navbar-light bg-light ">
-                    <img src="image.png" class="avatar">
-                    <input type="submit" class="btn btn-secondary default btn  " value="Logout" onclick="window.location.href='../Home-Page/index.html'" name="logout">
-                </nav>
-                <div class="dashboard-content ms-5 px-3 pt-4">
-                    <form class="form-group">
-                        <table class="table table-borderless justify-content-center">
-                            <thead></thead>
-                            <tbody>
-                                <?php
-                                while ($row = mysqli_fetch_assoc($result)) {
+            <nav class="navbar navbar-expand-md py-3 navbar-light bg-light ">
+                <img src="image.png" class="avatar">
+                <form method="POST" action="http://localhost/Dcsmsv-5.1%20-%20Copy/Home-Page/index.html">
+                    <input type="submit" class="btn btn-secondary default btn" value="Logout" onclick="logOut()" name="logout" />
+                </form>
+            </nav>
 
-                                ?>
-                                    <tr>
-                                        <td>
-                                            <p><strong>Order ID:<?php echo $row['order_id']; ?></strong></p>
-                                            <textarea class="form-control z-depth-1" id="exampleFormControlTextarea1" rows="10" cols="50"><?php echo $row['complain_description']; ?></textarea>
-                                        </td>
-                                    </tr>
+    <div class="dashboard-content ms-5 px-3 pt-4">
+        <form class="form-group">
+            
+        <?php
+        $sql = "SELECT * FROM complain 
+                join job_order on job_order.job_order_id=complain.order_id GROUP BY order_id desc";
 
+        $result = mysqli_query($conn, $sql);
 
-                                    <tr>
-
-                                        <td>
-                                            <div class="col-sm-12 mb-4" style=" text-align: right; margin-top: 20px;">
-                                                <label> </label>
-                                                <div class="container">
-                                                    <!-- Button trigger modal -->
-                                                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal">TAKE AN ACCTION</button>
-
-                                                    <!-- Modal -->
-                                                    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                                        <div class="modal-dialog modal-sm modal-fullscreen-sm-down">
-                                                            <div class="modal-content">
-                                                                <div class="modal-header">
-                                                                    <h5 class="modal-title text text-danger" id="exampleModalLabel">Emlpoyee ID 102458</h5>
-
-                                                                </div>
-
-                                                                <div class="modal-body">
-                                                                    <p class="text justify-content-center"><?php echo $row['complain_description']; ?>
-                                                                </div>
-
-                                                                <div class="modal-footer">
-                                                                    <button type="button" class="btn btn-primary  align-center col-sm-6" data-bs-dismiss="modal">OK</button>
-
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                </div>
-            </div>
-            </td>
-
-    <?php }
-                            } ?>
-    </tr>
-    </tbody>
+        if (!$result) {
+            die("Invalid query" . mysqli_error($conn));
+        } else {
+            while ($row = mysqli_fetch_assoc($result)) 
+            {                   
+                if (!empty($row))
+                {                                 
+        ?>
+    <table class="table table-borderless justify-content-center">
+        <thead></thead>
+        <tbody>
+            <tr>
+                <td>
+                    <p><strong>Order ID:<?php echo $row['order_id']; ?></strong></p>
+                    <textarea class="form-control z-depth-1" id="exampleFormControlTextarea1" rows="5" cols="50" readonly ><?php echo $row['complain_description']; ?></textarea>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="col-sm-12 mb-4" style=" text-align: right; margin-top: 20px;">
+                        <label></label>
+                        <div class="container">
+                            <!-- Button trigger modal -->
+                            <button type='button' name="accept" class='btn btn-primary btn-sm' data-bs-toggle='modal' data-bs-target='#exampleModal<?php echo $row['order_id']; ?>'>TAKE AN ACCTION</button>
+                            
+                            <!-- Modal -->
+                            <div class="modal fade" id="exampleModal<?php echo $row['order_id']; ?>" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-sm modal-fullscreen-sm-down">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title text text-danger" id="exampleModalLabel">Emlpoyee ID : <?php echo $row['aemp_id']; ?></h5>
+                                        </div>
+                                        <div class="modal-footer">
+                                        <button type="button" class="btn btn-primary align-center col-sm-6" data-bs-dismiss="modal" id="ok-button-<?php echo $row['order_id']; ?>" href="http://localhost/Dcsmsv-5.1%20-%20Copy/Admin-Dashboard/emplyoeelist.php">OK</button>
+                                        
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
     </table>
-    </form>
-
-
-
-
-
+<?php
+        }
+    }  
+}
+?>
+                    
+        </form>
         </div>
 
+    </div>
+ </div>
+ <script>
+    // add a click event listener to all OK buttons
+    var okButtons = document.querySelectorAll('[id^="ok-button-"]');
+    for (var i = 0; i < okButtons.length; i++) {
+        okButtons[i].addEventListener('click', function() {
+            // get the URL of the page to load from the button's href attribute
+            var pageUrl = this.getAttribute('href');
 
-
-
-        </div>
-        </div>
+            // redirect to the page
+            window.location.href = pageUrl;
+        });
+    }
+</script>
 
         <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.min.js" integrity="sha384-IDwe1+LCz02ROU9k972gdyvl+AESN10+x7tBKgc9I5HFtuNz0wWnPclzo6p9vxnk" crossorigin="anonymous"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <script src="https://kit.fontawesome.com/c752b78af3.js" crossorigin="anonymous"></script>
-
 
         <script>
             $(".sidebar ul li").on('click', function() {
@@ -146,7 +154,19 @@ if (!$result) {
                 $('.sidebar').removeClass('active');
             })
         </script>
+        <script>
 
+            function logOut() {
+                    // Send an HTTP POST request to the logout.php script
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('POST', 'logout.php');
+                    xhr.send();
+
+                    console.log('Redirecting to index.html');
+                    window.location.href='../Home-Page/index.html';
+            }
+
+        </script>
 
     </body>
 

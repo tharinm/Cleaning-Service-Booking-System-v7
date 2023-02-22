@@ -35,7 +35,7 @@ function sendmail($email, $v_code)
         //Content
         $mail->isHTML(true);                                  //Set email format to HTML
         $mail->Subject = 'Email Verification From My Cleaners Service';
-        $mail->Body    = "Click the link to verify the email address <a href='http://localhost/Dcsmsv-5.1/Home-Page/verify.php?email=$email&v_code=$v_code'>Click Here</a>";
+        $mail->Body    = "Click the link to verify the email address <a href='http://localhost/Dcsmsv-5.1%20-%20Copy/Home-Page/verify.php?email=$email&v_code=$v_code'>Click Here</a>";
 
         $mail->send();
         return true;
@@ -105,7 +105,7 @@ if (isset($_POST['register'])) {
                      mysqli_query($conn,$sql1);
                     }
 
-                    if($role=='employee')
+                    else if($role=='employee')
                     {
                      $sql2= "INSERT INTO employee(user_name,emp_email)VALUES('$username','$email')";
                      mysqli_query($conn,$sql2);

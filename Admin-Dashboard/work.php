@@ -1,5 +1,10 @@
 <?php
+session_start();
 include_once('../Home-Page/config.php');
+
+if (isset($_GET['id'])) 
+    $_SESSION['session_id'] = $_GET['id']; 
+
 
 ?>
 <!DOCTYPE html>
@@ -29,15 +34,13 @@ include_once('../Home-Page/config.php');
                 <button class="btn d-md-none d-block close-btn px-1 py-0 text-white"><i class="fa-solid fa-bars-staggered"></i></button>
             </div>
 
-
             <ul class="list-unstyled px-2 ">
-                <li class=""><a href="registeremployee.php" class="text-decoration-none px-3 py-3 d-block">REGISTER EMPLOYEE</a></li>
-                <li class=""><a href="payment.php" class="text-decoration-none px-3 py-3 d-block">PAYMENT</a></li>
-                <li class="active"><a href="work.php" class="text-decoration-none px-3 py-3 d-block">WORKS</a></li>
-                <li class=""><a href="emplyoeelist.php" class="text-decoration-none px-3 py-3 d-block">EMPLOYEE LIST</a></li>
-                <li class=""><a href="userlist.php" class="text-decoration-none px-3 py-3 d-block">USER LIST</a></li>
-                <li class=""><a href="complaign.php" class="text-decoration-none px-3 py-3 d-block">COMPLAINS</a></li>
-
+                <?php echo "<li class=''><a href='registeremployee.php?id=".$_SESSION['session_id']."' class='text-decoration-none px-3 py-3 d-block'>REGISTER EMPLOYEE</a></li>" ?>
+                <?php echo "<li class=''><a href='payment.php?id=".$_SESSION['session_id']."' class='text-decoration-none px-3 py-3 d-block'>PAYMENT</a></li> " ?>
+                <?php echo "<li class='active'><a href='work.php?id=".$_SESSION['session_id']."' class='text-decoration-none px-3 py-3 d-block'>WORKS</a></li> "?>
+                <?php echo "<li class=''><a href='emplyoeelist.php?id=".$_SESSION['session_id']."' class='text-decoration-none px-3 py-3 d-block'>EMPLOYEE LIST</a></li> "?>
+                <?php echo "<li class=''><a href='userlist.php?id=".$_SESSION['session_id']."' class='text-decoration-none px-3 py-3 d-block'>USER LIST</a></li>" ?>
+                <?php echo "<li class=''><a href='complaign.php?id=".$_SESSION['session_id']."' class='text-decoration-none px-3 py-3 d-block'>COMPLAINS</a></li>" ?>
 
             </ul>
 
@@ -46,17 +49,18 @@ include_once('../Home-Page/config.php');
         <div class="content">
             <nav class="navbar navbar-expand-md py-3 navbar-light bg-light ">
 
-
-            <div class="search" align="left">
-                <form id="search-form">
-                    <label for="search">Enter search term:</label>
-                    <input type="text" id="search" name="search">
-                    <input type="submit" value="Search">
-                </form>
-            </div>
+                <div class="search" align="left">
+                    <form id="search-form">
+                        <label for="search">Enter search term:</label>
+                        <input type="text" id="search" name="search">
+                        <input type="submit" value="Search">
+                    </form>
+                </div>
 
                 <img src="image.png" class="avatar">
-                <input type="submit" class="btn btn-secondary default btn  " value="Logout" onclick="window.location.href='../Home-Page/index.html'" name="logout">
+                    <form method="POST" action="http://localhost/Dcsmsv-5.1%20-%20Copy/Home-Page/index.html">
+                        <input type="submit" class="btn btn-secondary default btn" value="Logout" onclick="logOut()" name="logout" />
+                    </form>
             </nav>
 
             <script>
@@ -99,12 +103,12 @@ include_once('../Home-Page/config.php');
                     </thead>
                     <tbody>
                         <?php
-                        $query = mysqli_query($conn, "SELECT  job_order_id,job_order_category,job_order_date,emp_id,cus_id from registered_employee,job_order where job_order_id=1 and emp_id=1 ");
+                        $query = mysqli_query($conn, "SELECT  job_order_id,aemp_id,job_order_category,job_order_date,cus_id from job_order  ");
 
                         while ($row = mysqli_fetch_assoc($query)) {
                             echo   "<tr>";
                             echo "  <td>$row[job_order_id]</td>";
-                            echo "  <td>$row[emp_id]</td>";
+                            echo "  <td>$row[aemp_id]</td>";
                             echo "  <td>$row[cus_id]</td>";
                             echo "  <td>$row[job_order_category]</td>";
                             echo "  <td>$row[job_order_date]</td>";
@@ -115,30 +119,7 @@ include_once('../Home-Page/config.php');
                         ?>
                 </table>
             </div>
-            <!-- <div class="registeremp ms-5 px-3 pt-4">
-                <table class="table">
-                    <thead>
-                        <tr class="col-sm-2">
-                            <td class="text text-info">ORDER ID</td>
-                            <td class="text text-info">EMPLOYEE ID</td>
-                            <td class="text text-info">CUSTOMER ID</td>
-                            <td class="text text-info">JOB DETAILS</td>
-                            <td class="text text-info">DATE</td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr></tr>
-                        <tr class="col-sm-2">
-                            <td scope="col">102547</td>
-                            <td scope="col">102365</td>
-                            <td scope="col">145236</td>
-                            <td scope="col">Residential Cleaning</td>
-                            <td scope="col">08.11.2022</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>-->
-
+            
 
         </div>
     </div>
@@ -164,6 +145,19 @@ include_once('../Home-Page/config.php');
         $('.close-btn').on('click', function() {
             $('.sidebar').removeClass('active');
         })
+    </script>
+    <script>
+
+        function logOut() {
+                // Send an HTTP POST request to the logout.php script
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', 'logout.php');
+                xhr.send();
+
+                console.log('Redirecting to index.html');
+                window.location.href='../Home-Page/index.html';
+        }
+
     </script>
 
 

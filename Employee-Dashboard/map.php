@@ -1,3 +1,13 @@
+<?php
+session_start();
+include_once('../Home-page/config.php');
+
+if (isset($_GET['id'])) 
+  $_SESSION['session_id']= $_GET['id']; 
+
+if (isset($_GET['cusid']))
+  $_SESSION['cus_id']= $_GET['cusid'];
+?>
 <!DOCTYPE html>
 <html lang='en'>
    <head>

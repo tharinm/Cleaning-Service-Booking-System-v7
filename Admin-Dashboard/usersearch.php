@@ -24,10 +24,10 @@ include_once('../Home-page/config.php');
         if (isset($_POST['search'])) {
           $search = $_POST['search'];
           // Execute SELECT query to search for results using the search query
-          $sql = "SELECT * FROM customer WHERE cus_id LIKE ? OR user_name LIKE ?";
+          $sql = "SELECT * FROM customer WHERE cus_id LIKE ? OR user_name LIKE  ? OR email LIKE ? OR mobile LIKE ? OR nic LIKE ?";
           $stmt = mysqli_prepare($conn, $sql);
           $like = "%$search%";
-          mysqli_stmt_bind_param($stmt, "ss", $like, $like);
+          mysqli_stmt_bind_param($stmt, "sssss", $like, $like,$like,$like,$like);
           mysqli_stmt_execute($stmt);
           $result = mysqli_stmt_get_result($stmt);
 
@@ -39,16 +39,25 @@ include_once('../Home-page/config.php');
             echo "<thead class='col-sm-4'>";
             echo "<tr>";
             echo "<th>ID</th>";
-            echo "<th>Name</th>";
+            echo "<th>USER-Name</th>";
             echo "<th>Email</th>";
+            echo "<th>Mobile-No</th>";
+            echo "<th>NIC</th>";
+            echo "<th>Total Orders</th>";
             echo "</tr>";
             echo "</thead>";
             echo "<tbody>";
             while ($row = mysqli_fetch_assoc($result)) {
+
+              $query1 = mysqli_query($conn,"SELECT COUNT(status) as count FROM job_order WHERE status='Completed' and cus_id=$row[cus_id]");
+              $count = mysqli_fetch_array($query1);
               echo "<tr>";
               echo "<td>" . $row['cus_id'] . "</td>";
               echo "<td>" . $row['user_name'] . "</td>";
               echo "<td>" . $row['email'] . "</td>";
+              echo "<td>" . $row['mobile'] . "</td>";
+              echo "<td>" . $row['nic'] . "</td>";
+              echo "<td>" . $count['count'] . "</td>";
               echo "</tr>";
             }
             echo "</tbody>";

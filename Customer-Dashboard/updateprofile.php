@@ -1,57 +1,89 @@
 <?php
 session_start();
 include('../Home-page/config.php');
+include('updateprofilevalidate.php');
 
-if (isset($_GET['username']))
- {
-  $username = $_GET['username'];
-  $_SESSION['cusname'] = $username;
+if (isset($_GET['id'])) 
+  $_SESSION['session_id']= $_GET['id']; 
 
-    $sql2=mysqli_query($conn,"SELECT cus_id from customer where user_name in('$username')");
-    $cusid=mysqli_fetch_array($sql2);
-    if(!$sql2){
-        die("Invalid query" . mysqli_error($conn));
-    }else{
-        $_SESSION['cus_id']=$cusid['cus_id'];
-        
-    }
-  }
-  $cusid=$_SESSION['cus_id'];
-  print_r($_SESSION);
+if (isset($_GET['cusid']))
+  $_SESSION['cus_id']= $_GET['cusid'];
 
-  echo $cusid;
-if (isset($_POST['submit'])) {
+if (isset($_GET['oid'])){
+  $_SESSION['order_id']=$_GET['oid'];
+}else{
+  $cus_id = mysqli_real_escape_string($conn, $_SESSION['cus_id']);
+    $result3=mysqli_query($conn,"SELECT job_order_id from job_order where cus_id ='$cus_id' order by job_order_id desc limit 1");
+    $row3=mysqli_fetch_assoc($result3);
+
+    if(!empty($row3['job_order_id']))
+      $_SESSION['order_id'] = $row3['job_order_id'];
+    else 
+      $_SESSION['order_id']=0;
+}
+$cus_id = mysqli_real_escape_string($conn, $_SESSION['cus_id']);
 
 
-
-  $firstname = mysqli_real_escape_string($conn, $_POST['first']);
-  $lastname  = mysqli_real_escape_string($conn, $_POST['last']);
-  $address = mysqli_real_escape_string($conn, $_POST['address']);
-  $postalcode = mysqli_real_escape_string($conn, $_POST['postal_code']);
-  $nic = mysqli_real_escape_string($conn, $_POST['nic']);
-  $mobile = mysqli_real_escape_string($conn, $_POST['mobile_no']);
-  // $username = $_SESSION['username'];
-  // $email = $_SESSION['email'];
-
-  //$result=mysqli_query($conn,"SELECT id,mobile from users where role='user' or mobile=$mobile");
-  //$row=mysqli_fetch_array($result);
-  // $result1 = mysqli_query($conn, "SELECT cus_id from customer where user_name like '$username' or email like '$email' ");
-  // $row = mysqli_fetch_assoc($result1);
-  // $_SESSION['id'] = $row['cus_id'];
-  // print_r($_SESSION);
-  $sql1 = "UPDATE customer SET first_name='$firstname',last_name='$lastname',address='$address',nic='$nic',postal_code=$postalcode WHERE cus_id=$cusid ";
-  $results = mysqli_query($conn, $sql1);
-
-  if (!$results) {
-    die("Invalid query" . mysqli_error($conn));
+if (isset($_SESSION['session_id'])) 
+{
+  $session_id = mysqli_real_escape_string($conn, $_SESSION['session_id']);
+  if ($stmt = mysqli_prepare($conn, "SELECT sessions.session_id AS session_id, sessions.user_id AS user_id, sessions.username AS username, customer.cus_id AS cus_id
+      FROM sessions 
+      JOIN customer ON customer.user_name= sessions.username
+      WHERE sessions.session_id = ? LIMIT 1")) {
+      mysqli_stmt_bind_param($stmt, "i", $session_id);
+      if (mysqli_stmt_execute($stmt)) {
+          $result = mysqli_stmt_get_result($stmt);
+          if (mysqli_num_rows($result) > 0) {
+              while($row = mysqli_fetch_assoc($result)) {
+                  // echo "Session ID: " . $row['session_id'] . " User ID: " . $row['user_id'] . " User name: " . $row['username'] . " Cus ID: " . $row['cus_id'] . "<br>";
+                  // $_SESSION['cus_id']=$row['cus_id'];
+              }
+          } else {
+              echo "No data found";
+          }
+          mysqli_free_result($result);
+      } else {
+          echo "Error: " . mysqli_stmt_error($stmt);
+      }
+      mysqli_stmt_close($stmt);
   } else {
-    echo "<script> alert('account updated sucessfully!');</script>";
+      echo "Error: " . mysqli_error($conn);
   }
-
-  mysqli_close($conn);
 }
 
+
+if (isset($_POST['submit'])) 
+{
+  if ($firstnameErr == "" && $lastnameErr == "" && $addressErr == "" && $postalcodeErr == "" && $nicErr == "" && $mobileErr == "")
+  {
+
+      $firstname = mysqli_real_escape_string($conn, $_POST['first']);
+      $lastname  = mysqli_real_escape_string($conn, $_POST['last']);
+      $address = mysqli_real_escape_string($conn, $_POST['address']);
+      $postalcode = mysqli_real_escape_string($conn, $_POST['postal_code']);
+      $nic = mysqli_real_escape_string($conn, $_POST['nic']);
+      $mobile = mysqli_real_escape_string($conn, $_POST['mobile_no']);
+      // $cus_id = mysqli_real_escape_string($conn, $_SESSION['cus_id']);
+      
+      $sql1 = "UPDATE customer SET first_name='$firstname',last_name='$lastname',address='$address',nic='$nic',postal_code=$postalcode WHERE cus_id=$cus_id ";
+      $results = mysqli_query($conn, $sql1);
+
+      if (!$results) {
+        die("Invalid query" . mysqli_error($conn));
+      } else {
+        echo "<script> alert('account updated sucessfully!');</script>";
+        header("refresh: 0; http://localhost/Dcsmsv-5.1%20-%20Copy/Customer-Dashboard/postjob.php");
+      }
+
+  }else{
+    echo "<h3 class='error' align='center'>Your Account isn't Updated!!! please fill the details correctly....!!!!</h3>";
+  }  
+}
+print_r($_SESSION);
 ?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -70,6 +102,12 @@ if (isset($_POST['submit'])) {
 
 
   <style>
+
+  .error {
+            color: #FF0001;
+        }
+
+
     .navbar {
       display: flex;
       justify-content: flex-end;
@@ -96,26 +134,27 @@ if (isset($_POST['submit'])) {
         <button class="btn d-md-none d-block close-btn px-1 py-0 text-white"><i class="fa-solid fa-bars-staggered"></i></button>
       </div>
 
-
       <ul class="list-unstyled px-2 ">
-        <li class=""><a href="postjob.php" class="text-decoration-none px-3 py-3 d-block">POST JOB</a></li>
-        <li class=""><a href="orderstatus.php" class="text-decoration-none px-3 py-3 d-block">ORDER STATUS</a></li>
+       <?php echo "<li class=''><a href='postjob.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."' class='text-decoration-none px-3 py-3 d-block'>POST JOB</a></li>"; ?>
+       <?php echo "<li class=''><a href='pendingorders.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."' class='text-decoration-none px-3 py-3 d-block'>PENDING ORDERS</a></li>"; ?>
+       <?php echo "<li class=''><a href='orderstatus.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."' class='text-decoration-none px-3 py-3 d-block'>ORDER STATUS</a></li>"; ?>
         <!-- <li class=""><a href="payment.html" class="text-decoration-none px-3 py-3 d-block">PAYMENT</a></li> -->
-        <li class=""><a href="reshedule.php" class="text-decoration-none px-3 py-3 d-block">RESHEDULE</a></li>
-        <li class=""><a href="myorders.php" class="text-decoration-none px-3 py-3 d-block">MY ORDERS</a></li>
-        <li class=""><a href="complaign.php" class="text-decoration-none px-3 py-3 d-block">COMPLAIN</a></li>
-        <li class="active"><a href="updateprofile.php" class="text-decoration-none px-3 py-3 d-block">UPDATE PROFILE</a></li>
-        <li class=""><a href="store.php" class="text-decoration-none px-3 py-3 d-block">REWARDS</a></li>
-        <li class=""><a href="help.html" class="text-decoration-none px-3 py-3 d-block">HELP</a></li>
+       <?php echo "<li class=''><a href='reshedule.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."' class='text-decoration-none px-3 py-3 d-block'>RESHEDULE</a></li>" ; ?>
+       <?php echo "<li class=''><a href='myorders.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."' class='text-decoration-none px-3 py-3 d-block'>MY ORDERS</a></li>" ; ?> 
+       <?php echo " <li class=''><a href='complaign.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."' class='text-decoration-none px-3 py-3 d-block'>COMPLAIN</a></li> "; ?>
+       <?php echo "<li class= 'active'><a href='updateprofile.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."' class='text-decoration-none px-3 py-3 d-block'>UPDATE PROFILE</a></li> " ; ?>
+       <?php echo "<li class=''><a href='store.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."' class='text-decoration-none px-3 py-3 d-block'>REWARDS</a></li>" ; ?>
+       <?php echo "<li class=''><a href='help.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."' class='text-decoration-none px-3 py-3 d-block'>HELP</a></li>" ; ?>
 
       </ul>
-
 
     </div>
     <div class="content">
       <nav class="navbar navbar-expand-md py-3 navbar-light bg-light ">
         <img src="image.png" class="avatar">
-        <input type="submit" class="btn btn-secondary default btn  " value="Logout" onclick="window.location.href='../Home-Page/index.html'" name="logout" />
+        <form method="POST" action="http://localhost/Dcsmsv-5.1%20-%20Copy/Home-Page/index.html">
+                       <input type="submit" class="btn btn-secondary default btn" value="Logout" onclick="logOut()" name="logout" />
+        </form>
       </nav>
 
 
@@ -123,22 +162,28 @@ if (isset($_POST['submit'])) {
       <div class="dashboard-content ms-5 px-3 pt-4 ">
         <div class="container ">
           <div class="row no-gutters">
-            <form name="myform" class="form-group" method="POST" action="">
+            <form name="myform" class="form-group" method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
               <div class="row jumbotron">
                 <div class="col-sm-6 mb-4">
                   <label>First Name</label>
                   <input type="text" class="form-control " name="first">
+                  <span class="error">* <?php echo $firstnameErr; ?> </span>
+                  <br><br>
                 </div>
 
 
                 <div class="col-sm-6 mb-4">
                   <label>Last Name</label>
                   <input type="text" class="form-control " name="last">
+                  <span class="error">* <?php echo $lastnameErr; ?> </span>
+                  <br><br>
                 </div>
 
                 <div class="col-sm-6 mb-4">
                   <label>Address</label>
                   <input type="text" class="form-control " placeholder="Street-1" name="address">
+                  <span class="error">* <?php echo $addressErr; ?> </span>
+                  <br><br>
                 </div>
                 <div class="col-sm-6 mb-4">
                   <label></label>
@@ -149,6 +194,8 @@ if (isset($_POST['submit'])) {
 
                 <div class="col-sm-6 mb-4">
                   <input type="text" class="form-control" placeholder="postel-code" name="postal_code">
+                  <span class="error">* <?php echo $postalcodeErr; ?> </span>
+                  <br><br>
                 </div>
 
 
@@ -159,6 +206,8 @@ if (isset($_POST['submit'])) {
                 <div class="col-sm-6 mb-4">
                   <label>NIC</label>
                   <input type="text" class="form-control" name="nic">
+                  <span class="error">* <?php echo $nicErr; ?> </span>
+                  <br><br>
                 </div>
 
 
@@ -174,6 +223,8 @@ if (isset($_POST['submit'])) {
                 <div class="col-sm-6 mb-4">
                   <label>Mobile No</label>
                   <input type="text" class="form-control" name="mobile_no" value="" placeholder="enter your registered mobile">
+                  <span class="error">* <?php echo $mobileErr; ?> </span>
+                  <br><br>
                 </div>
 
                 <div class="col-sm-12 mb-4" style=" text-align: right; margin-top: 20px;">
@@ -212,6 +263,19 @@ if (isset($_POST['submit'])) {
     $('.close-btn').on('click', function() {
       $('.sidebar').removeClass('active');
     })
+  </script>
+  <script>
+
+      function logOut() {
+          // Send an HTTP POST request to the logout.php script
+          var xhr = new XMLHttpRequest();
+          xhr.open('POST', 'logout.php');
+          xhr.send();
+
+          console.log('Redirecting to index.html');
+          window.location.href='../Home-Page/index.html';
+      }
+
   </script>
 
 
