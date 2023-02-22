@@ -24,10 +24,10 @@ include_once('../Home-page/config.php');
         if (isset($_POST['search'])) {
           $search = $_POST['search'];
           // Execute SELECT query to search for results using the search query
-          $sql = "SELECT * FROM job_order WHERE job_order_id LIKE ? OR cus_id LIKE ?";
+          $sql = "SELECT * FROM job_order WHERE job_order_id LIKE ? OR cus_id LIKE ? OR job_order_category LIKE ? OR job_order_date LIKE ?";
           $stmt = mysqli_prepare($conn, $sql);
           $like = "%$search%";
-          mysqli_stmt_bind_param($stmt, "ss", $like, $like);
+          mysqli_stmt_bind_param($stmt, "ssss", $like, $like,$like,$like);
           mysqli_stmt_execute($stmt);
           $result = mysqli_stmt_get_result($stmt);
 
@@ -39,7 +39,7 @@ include_once('../Home-page/config.php');
             echo "<thead class='col-sm-4'>";
             echo "<tr>";
             echo "<th>ORDER ID</th>";
-            // echo "<th>EMPLOYEE ID</th>";
+            echo "<th>EMPLOYEE ID</th>";
             echo "<th>CUSTOMER ID</th>";
             echo "<th>JOB DETAILS</th>";
             echo "<th>DATE</th>";
@@ -49,7 +49,7 @@ include_once('../Home-page/config.php');
             while ($row = mysqli_fetch_assoc($result)) {
               echo "<tr>";
               echo "<td>" . $row['job_order_id'] . "</td>";
-            //   echo "<td>" . $row['emp_id'] . "</td>";
+              echo "<td>" . $row['aemp_id'] . "</td>";
               echo "<td>" . $row['cus_id'] . "</td>";
               echo "<td>" . $row['job_order_category'] . "</td>";
               echo "<td>" . $row['job_order_date'] . "</td>";

@@ -1,24 +1,19 @@
 <?php
-
+session_start();
 include('config.php');
 
-// session_start();
 $erorrs = [];
-// $_SESSION['id']=1;
 
+include('sessions.php');
 
-
-if (!isset($_SESSION['login'])) {
+if (isset($_SESSION['session_id'])) {
     if (isset($_POST['login'])) {
-
+    
         $username = $_POST['username'];
         $password  = $_POST['password'];
         $role = $_POST['role'];
-        // $_SESSION['username']=$username; 
-        // $_SESSION['email']=$username;
-        //check user
-
-        $sql = "SELECT * FROM `users`  where username = '$username' OR email = '$username' AND role = '$role'";
+        
+        $sql = "SELECT * FROM `users`  where (username = '$username' OR email = '$username') AND role = '$role'";
 
         $result = mysqli_query($conn, $sql);
         // $row=mysqli_fetch_assoc($result);
@@ -33,17 +28,17 @@ if (!isset($_SESSION['login'])) {
                         //   $_SESSION['login'] = true;
                         // $_SESSION['name'] = $fetch['name'];
                         echo "<script> alert('Login Successfully');</script>";
-                        header("refresh: 0; http://localhost/Dcsmsv-5.1/Customer-Dashboard/updateprofile.php");
+                        header("refresh: 0; http://localhost/Dcsmsv-5.1%20-%20Copy/Customer-Dashboard/updateprofile.php");
                     } elseif ($fetch['v_user'] == 1 && $fetch['role'] == 'employee') {
                         //  $_SESSION['login'] = true;
                         // $_SESSION['name'] = $fetch['name'];
                         echo "<script> alert('Login Successfully');</script>";
-                        header("refresh: 0; http://localhost/Dcsmsv-5.1/Employee-Dashboard/updated.php");
+                        header("refresh: 0; http://localhost/Dcsmsv-5.1%20-%20Copy/Employee-Dashboard/updated.php?username=".$username);
                     } elseif ($fetch['v_user'] == 1 && $fetch['role'] == 'admin') {
                         //  $_SESSION['login'] = true;
                         // $_SESSION['name'] = $fetch['name'];
-                        // echo "<script> alert('Login Successfully');</script>";
-                        header("refresh: 0; http://localhost/Dcsmsv-5.1/Admin-Dashboard/registeremployee.php");
+                        echo "<script> alert('Login Successfully');</script>";
+                        header("refresh: 0; http://localhost/Dcsmsv-5.1%20-%20Copy/Admin-Dashboard/registeremployee.php");
                     } else {
                         echo "<script>alert('User Not Verified Please Check Your Mail')</script>";
                     }
@@ -61,10 +56,7 @@ if (!isset($_SESSION['login'])) {
     }
 }
 
-/*else{
-    {
-   header("location: index.php");
-} */
+
 
 ?>
 
@@ -108,14 +100,6 @@ if (!isset($_SESSION['login'])) {
 
 
 
-
-
-
-
-
-
-
-
 </head>
 
 <body>
@@ -145,10 +129,6 @@ if (!isset($_SESSION['login'])) {
                             <a href="reg.php"><u>Create an account</u></a><br>
                             <a id="btn" class="text-danger " href="forget-password.php" style="font-size: 15px;">Forget Password</a>
                         </p>
-
-
-
-
 
 
                     </div>

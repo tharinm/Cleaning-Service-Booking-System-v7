@@ -1,15 +1,25 @@
 <?php
 include_once('../Home-page/config.php');
+session_start();
+
+if (isset($_GET['id'])) 
+    $_SESSION['session_id'] = $_GET['id'];
+if (isset($_GET['cusid']))
+    $_SESSION['cus_id'] = $_GET['cusid'];
+if (isset($_GET['oid']))
+    $_SESSION['order_id']=$_GET['oid'];
 
 $vacum = 400;
 $broom = 1000;
 $axe = 1200;
-
-$sql = mysqli_query($conn, 'SELECT cus_points from customer where cus_id=1');
+$cus_id   = mysqli_real_escape_string($conn, $_SESSION['cus_id']);
+$sql = mysqli_query($conn, "SELECT cus_points from customer where cus_id= '$cus_id'");
 $result = mysqli_fetch_array($sql);
 
-if (isset($_POST['buy'])) {
-    if ($result['cus_points']> $vacum) {
+if (isset($_POST['buy'])) 
+{
+    if ($result['cus_points']> $vacum)
+    {
         echo "<script>
             alert('Item added to your cart');
         </script>";
@@ -19,8 +29,10 @@ if (isset($_POST['buy'])) {
     }
 }
 
-if (isset($_POST['buy_1'])) {
-    if ($result['cus_points'] > $vacum) {
+if (isset($_POST['buy_1'])) 
+{
+    if ($result['cus_points'] > $vacum) 
+    {
         echo "<script>
             alert('Item added to your cart');
         </script>";
@@ -30,8 +42,10 @@ if (isset($_POST['buy_1'])) {
     }
 }
 
-if (isset($_POST['buy_2'])) {
-    if ($result['cus_points']> $vacum) {
+if (isset($_POST['buy_2'])) 
+{
+    if ($result['cus_points']> $vacum) 
+    {
         echo "<script>
             alert('Item added to your cart');
         </script>";
@@ -40,9 +54,6 @@ if (isset($_POST['buy_2'])) {
         </script>";
     }
 }
-
-
-
 
 ?>
 
@@ -60,6 +71,7 @@ if (isset($_POST['buy_2'])) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="CSS/help.css">
     <link rel="stylesheet" type="" href="CSS/store.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
         .navbar {
@@ -88,15 +100,16 @@ if (isset($_POST['buy_2'])) {
                 <button class="btn d-md-none d-block close-btn px-1 py-0 text-white"><i class="fa-solid fa-bars-staggered"></i></button>
             </div>
             <ul class="list-unstyled px-2 ">
-                <li class=""><a href="postjob.php" class="text-decoration-none px-3 py-3 d-block">POST JOB</a></li>
-                <li class=""><a href="orderstatus.php" class="text-decoration-none px-3 py-3 d-block">ORDER STATUS</a></li>
+                <?php echo "<li class=''><a href='postjob.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."&&oid=".$_SESSION['order_id']."' class='text-decoration-none px-3 py-3 d-block'>POST JOB</a></li>"; ?>
+                <?php echo "<li class=''><a href='pendingorders.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."&&oid=".$_SESSION['order_id']."' class='text-decoration-none px-3 py-3 d-block'>PENDING ORDERS</a></li>"; ?>
+                <?php echo "<li class=''><a href='orderstatus.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."&&oid=".$_SESSION['order_id']."' class='text-decoration-none px-3 py-3 d-block'>ORDER STATUS</a></li>"; ?>
                 <!-- <li class=""><a href="payment.html" class="text-decoration-none px-3 py-3 d-block">PAYMENT</a></li> -->
-                <li class=""><a href="reshedule.php" class="text-decoration-none px-3 py-3 d-block">RESHEDULE</a></li>
-                <li class=""><a href="myorders.php" class="text-decoration-none px-3 py-3 d-block">MY ORDERS</a></li>
-                <li class=""><a href="complaign.php" class="text-decoration-none px-3 py-3 d-block">COMPLAIN</a></li>
-                <li class=""><a href="updateprofile.php" class="text-decoration-none px-3 py-3 d-block">UPDATE PROFILE</a></li>
-                <li class="active"><a href="store.php" class="text-decoration-none px-3 py-3 d-block">REWARDS</a></li>
-                <li class=""><a href="help.html" class="text-decoration-none px-3 py-3 d-block">HELP</a></li>
+                <?php echo "<li class=''><a href='reshedule.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."&&oid=".$_SESSION['order_id']."' class='text-decoration-none px-3 py-3 d-block'>RESHEDULE</a></li>"; ?>
+                <?php echo "<li class=''><a href='myorders.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."&&oid=".$_SESSION['order_id']."' class='text-decoration-none px-3 py-3 d-block'>MY ORDERS</a></li>"; ?>
+                <?php echo "<li class=''><a href='complaign.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."&&oid=".$_SESSION['order_id']."' class='text-decoration-none px-3 py-3 d-block'>COMPLAIN</a></li>"; ?>
+                <?php echo "<li class=''><a href='updateprofile.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."&&oid=".$_SESSION['order_id']."' class='text-decoration-none px-3 py-3 d-block'>UPDATE PROFILE</a></li>"; ?>
+                <?php echo "<li class='active'><a href='store.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."&&oid=".$_SESSION['order_id']."' class='text-decoration-none px-3 py-3 d-block'>REWARDS</a></li>"; ?>
+                <?php echo "<li class=''><a href='help.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."&&oid=".$_SESSION['order_id']."' class='text-decoration-none px-3 py-3 d-block'>HELP</a></li>"; ?>
             </ul>
 
 
@@ -104,7 +117,9 @@ if (isset($_POST['buy_2'])) {
         <div class="content">
             <nav class="navbar navbar-expand-md py-3 navbar-light bg-light ">
                 <img src="image.png" class="avatar">
-                <input type="submit" class="btn btn-secondary default btn  " value="Logout" onclick="window.location.href='../Home-Page/index.html'" name="logout" />
+                <form method="POST" action="http://localhost/Dcsmsv-5.1%20-%20Copy/Home-Page/index.html">
+                    <input type="submit" class="btn btn-secondary default btn" value="Logout" onclick="logOut()" name="logout" />
+                </form>
             </nav>
 
             <div class="registeremp ms-5 px-3 pt-4">
@@ -129,17 +144,17 @@ if (isset($_POST['buy_2'])) {
 
                         <div class="shopping-item">
                             <div class="item">
-                                <img src="vacum.jpg" alt="" class="goods">
+                                <img src="broom.jpg" alt="" class="goods">
                                 <input type="submit" class="btn buy" value="Buy" name="buy_1">
-                                <div class="points text-center"><img class="c" src="gold.png"><label class="amount">200</label></div>
+                                <div class="points text-center"><img class="c" src="gold.png"><label class="amount">250</label></div>
                             </div>
                         </div>
 
                         <div class="shopping-item">
                             <div class="item">
-                                <img src="vacum.jpg" alt="" class="goods">
+                                <img src="laisol.jpg" alt="" class="goods">
                                 <input type="submit" class="btn buy" value="Buy" name="buy_2">
-                                <div class="points text-center"><img class="c" src="gold.png"><label class="amount">200</label></div>
+                                <div class="points text-center"><img class="c" src="gold.png"><label class="amount">300</label></div>
                             </div>
                         </div>
                     </div>
@@ -172,6 +187,19 @@ if (isset($_POST['buy_2'])) {
             $('.sidebar').removeClass('active');
         })
     </script>
+    <script>
+
+        function logOut() {
+                // Send an HTTP POST request to the logout.php script
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', 'logout.php');
+                xhr.send();
+
+                console.log('Redirecting to index.html');
+                window.location.href='../Home-Page/index.html';
+        }
+
+</script>
 
 
 </body>

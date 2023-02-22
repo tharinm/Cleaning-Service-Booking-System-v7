@@ -1,5 +1,11 @@
 <?php
+session_start();
+// print_r($_SESSION);
 include_once('../Home-Page/config.php');
+ob_start();
+
+if (isset($_GET['id'])) 
+    $_SESSION['session_id'] = $_GET['id']; 
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
@@ -10,79 +16,7 @@ require('PHPmailer/Exception.php');
 require('PHPmailer/SMTP.php');
 require('PHPmailer/PHPMailer.php');
 
-function sendmail($row)
-{
-  $mail = new PHPMailer(true);
-
-  try {
-    //Server settings
-    // $mail->SMTPDebug = SMTP::DEBUG_SERVER;                          //Enable verbose debug output
-    $mail->isSMTP();                                                //Send using SMTP
-    $mail->Host = 'smtp.gmail.com';                                 //Set the SMTP server to send through
-    $mail->SMTPAuth = true;                                       //Enable SMTP authentication
-    $mail->Username = 'lkmoviesbazaar@gmail.com';                 //SMTP username
-    $mail->Password = 'owabqytypgocglyz';                       //SMTP password
-    $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;            //Enable implicit TLS encryption
-    $mail->Port = 465;                                          //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
-
-    //Recipients
-    $mail->setFrom('lkmoviesbazaar@gmail.com', 'Verifiy');
-    $mail->addAddress($row);     //Add a recipient
-
-    //Content
-    $mail->isHTML(true);                                  //Set email format to HTML
-    $mail->Subject = 'Email Verification From My Cleaners Service';
-    $mail->Body    = "Congratulation.Your succesfully Register in mycleners....click this link to login my cleaners...http://localhost/Dcsmsv-5/Home-Page/log.php";
-
-    $mail->send();
-    return true;
-  } catch (Exception $e) {
-    return false;
-  }
-}
-
-function sendmail1($row1)
-{
-  $mail = new PHPMailer(true);
-
-  try {
-    //Server settings
-    // $mail->SMTPDebug = SMTP::DEBUG_SERVER;                          //Enable verbose debug output
-    $mail->isSMTP();                                                //Send using SMTP
-    $mail->Host = 'smtp.gmail.com';                                 //Set the SMTP server to send through
-    $mail->SMTPAuth = true;                                       //Enable SMTP authentication
-    $mail->Username = 'lkmoviesbazaar@gmail.com';                 //SMTP username
-    $mail->Password = 'owabqytypgocglyz';                       //SMTP password
-    $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;            //Enable implicit TLS encryption
-    $mail->Port = 465;                                          //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
-
-    //Recipients
-    $mail->setFrom('lkmoviesbazaar@gmail.com', 'Verifiy');
-    $mail->addAddress($row1);     //Add a recipient
-
-    //Content
-    $mail->isHTML(true);                                  //Set email format to HTML
-    $mail->Subject = 'Email Verification From My Cleaners Service';
-    $mail->Body    = "Your not registered.Try Again.";
-
-    $mail->send();
-    return true;
-  } catch (Exception $e) {
-    return false;
-  }
-}
-
-$sql = "SELECT emp_fname,emp_qulification,filename from employee,image where id=1 and t_emp_id=1";
-$result = mysqli_query($conn, $sql);
-
-
-
-if (!$result) {
-  die("Invalid query" . mysqli_error($conn));
-} else {
-
 ?>
-
   <!DOCTYPE html>
   <html lang="en">
 
@@ -110,22 +44,26 @@ if (!$result) {
           <button class="btn d-md-none d-block close-btn px-1 py-0 text-white"><i class="fa-solid fa-bars-staggered"></i></button>
         </div>
         <ul class="list-unstyled px-2 ">
-          <li class="active"><a href="registeremployee.php" class="text-decoration-none px-3 py-3 d-block"></i>REGISTER EMPLOYEE</a></li>
-          <li class=""><a href="payment.php" class="text-decoration-none px-3 py-3 d-block">PAYMENT</a></li>
-          <li class=""><a href="work.php" class="text-decoration-none px-3 py-3 d-block">WORKS</a></li>
-          <li class=""><a href="emplyoeelist.php" class="text-decoration-none px-3 py-3 d-block">EMPLOYEE LIST</a></li>
-          <li class=""><a href="userlist.php" class="text-decoration-none px-3 py-3 d-block">USER LIST</a></li>
-          <li class=""><a href="complaign.php" class="text-decoration-none px-3 py-3 d-block">COMPLAINS</a></li>
+          
+         <?php echo "<li class='active'><a href='registeremployee.php?id=".$_SESSION['session_id']."' class='text-decoration-none px-3 py-3 d-block'>REGISTER EMPLOYEE</a></li>" ?>
+         <?php echo "<li class=''><a href='payment.php?id=".$_SESSION['session_id']."' class='text-decoration-none px-3 py-3 d-block'>PAYMENT</a></li> " ?>
+         <?php echo "<li class=''><a href='work.php?id=".$_SESSION['session_id']."' class='text-decoration-none px-3 py-3 d-block'>WORKS</a></li> "?>
+         <?php echo "<li class=''><a href='emplyoeelist.php?id=".$_SESSION['session_id']."' class='text-decoration-none px-3 py-3 d-block'>EMPLOYEE LIST</a></li> "?>
+         <?php echo "<li class=''><a href='userlist.php?id=".$_SESSION['session_id']."' class='text-decoration-none px-3 py-3 d-block'>USER LIST</a></li>" ?>
+         <?php echo "<li class=''><a href='complaign.php?id=".$_SESSION['session_id']."' class='text-decoration-none px-3 py-3 d-block'>COMPLAINS</a></li>" ?>
         </ul>
 
 
       </div>
       <div class="content">
 
-        <nav class="navbar navbar-expand-md py-3 navbar-light bg-light ">
-          <img src="image.png" class="avatar">
-          <input type="submit" class="btn btn-secondary default btn  " value="Logout" onclick="window.location.href='../Home-Page/index.html'" name="logout">
-        </nav>
+      <div class="content">
+            <nav class="navbar navbar-expand-md py-3 navbar-light bg-light ">
+                <img src="image.png" class="avatar">
+                <form method="POST" action="http://localhost/Dcsmsv-5.1%20-%20Copy/Home-Page/index.html">
+                    <input type="submit" class="btn btn-secondary default btn" value="Logout" onclick="logOut()" name="logout" />
+                </form>
+            </nav>
 
         <div class="registeremp ms-5 px-3 pt-4">
 
@@ -136,64 +74,178 @@ if (!$result) {
                   <td scope="col" class="text text-dark">NAME</td>
                   <td scope="col" class="text text-dark">IMAGES</td>
                   <td scope="col" class="text text-dark">QUALIFICATION</td>
+                  <td scope="col" class="text text-dark">Grama Certificate</td>
+                  <td scope="col" class="text text-dark">Medi Certificate</td>
                   <td scope="col" class="text text-dark">DESICION</td>
                 </tr>
               </thead>
               <tbody class="text-center col-sm-4">
-                <?php
+          <?php
 
-                while ($row = mysqli_fetch_assoc($result)) {
+            $sql = "SELECT * from employee
+            JOIN files ON files.e_id = employee.t_emp_id 
+            JOIN medifiles ON medifiles.e_id = employee.t_emp_id group by t_emp_id desc";
+            $result = mysqli_query($conn, $sql);
 
-                  echo   "<tr>";
-                  echo "  <td>$row[emp_fname]</td>"; ?>
-                  <td><img src="../Employee-Dashboard/image/<?php echo $row['filename']; ?>" width='200' height='150'></td>
+            while ($row = mysqli_fetch_assoc($result)) 
+            {
 
+                  echo  " <tr>";
+                    echo  " <td>$row[emp_fname]</td> ";
+                    echo  " <td><img src='../Employee-Dashboard/image/$row[emp_filename]' width='200' height='150'></td> ";
+                    echo  " <td>$row[emp_qulification]</td>";      
+                    // Modify the "Download" links in the table to include the employee ID
+                    echo "<td><a href='registeremployee.php?file_id=$row[id]&emp_id=$row[t_emp_id]'>Download</a></td>";
+                    echo "<td><a href='registeremployee.php?file1_id=$row[id]&emp_id=$row[t_emp_id]'>Download</a></td>";
+            
+                  echo "<td >
+                        <form method='post'>
+                          <button type='submit' value='accept' name='accept_" . $row['t_emp_id'] . "' class='btn btn-success ms-1'>Accept</button>
+                          <button type='submit' value='reject' name='reject_" . $row['t_emp_id'] . "' class ='btn btn-danger ms-1 mt-4'>Reject</button>                       
+                        </form>
+                        </td>";
+                      echo "  </tr>";
 
-              <?php echo "  <td>$row[emp_qulification]</td>";
-                  echo "<td>
-                  <button type='submit' value='accept' name='accept' class='btn btn-success ms-1'>Aceept</button>
-                  <button type='submit' value='reject' name='reject'class ='btn btn-danger ms-1'>Reject</button>
-                  </td>";
+                      // Add a conditional to check if the emp_id is set and retrieve the file associated with that employee
+              if (isset($_GET['emp_id'])) 
+              {
+                $emp_id = $_GET['emp_id'];
 
+                if (isset($_GET['file_id'])) 
+                {
+                    // fetch file to download from database
+                    $sql1 = "SELECT * FROM files WHERE e_id=$emp_id";
+                    $result1 = mysqli_query($conn, $sql1);
+                
+                    $file = mysqli_fetch_assoc($result1);
+                    $filepath = '../Employee-Dashboard/uploads/' . $file['name'];
+                
+                    if (file_exists($filepath)) 
+                    {
+                        // download the file
+                        header('Content-Description: File Transfer');
+                        header('Content-Type: application/octet-stream');
+                        header('Content-Disposition: attachment; filename=' . basename($filepath));
+                        header('Expires: 0');
+                        header('Cache-Control: must-revalidate');
+                        header('Pragma: public');
+                        header('Content-Length: ' . filesize($filepath));
+                        readfile($filepath);
+                    }                     
+                }
 
-                  echo " </td>";
-                  echo "  </tr>";
+                if (isset($_GET['file1_id'])) 
+                {
+                    // fetch file to download from database
+                    $sql2 = "SELECT * FROM medifiles WHERE e_id=$emp_id";
+                    $result2 = mysqli_query($conn, $sql2);
+
+                    $file1 = mysqli_fetch_assoc($result2);
+                    $filepath1 = '../Employee-Dashboard/mediuploads/' . $file1['name'];
+
+                    if (file_exists($filepath1)) 
+                    {
+                        // download the file
+                        header('Content-Description: File Transfer');
+                        header('Content-Type: application/octet-stream');
+                        header('Content-Disposition: attachment; filename=' . basename($filepath1));
+                        header('Expires: 0');
+                        header('Cache-Control: must-revalidate');
+                        header('Pragma: public');
+                        header('Content-Length: ' . filesize($filepath1));
+                        readfile($filepath1);
+                    }
                 }
               }
+            
+              if (isset($_POST['accept_' . $row['t_emp_id']])) 
+              {
 
-              ?>
-              <?php
-              if (isset($_POST['accept'])) {
+                  $email= $row['emp_email'];
 
-                //$query = mysqli_query($conn, "SELECT  job_order_id,job_order_category,job_order_date,status,emp_name,emp_profile,emp_status from job_order,registered_employee
-                // where job_order_id=1 and emp_id=1");
-                $sql1 = "INSERT INTO registered_employee(emp_name,emp_status,emp_filename,email,nic) SELECT distinct emp_fname,emp_qulification,filename,emp_email,emp_nic from employee,image where t_emp_id=1 and id=1";
-                $result1 = mysqli_query($conn, $sql1);
+                  function sendmail($email)
+                  {
+                    $mail = new PHPMailer(true);
+                  
+                    try {
+                      //Server settings
+                      // $mail->SMTPDebug = SMTP::DEBUG_SERVER;                          //Enable verbose debug output
+                      $mail->isSMTP();                                                //Send using SMTP
+                      $mail->Host = 'smtp.gmail.com';                                 //Set the SMTP server to send through
+                      $mail->SMTPAuth = true;                                       //Enable SMTP authentication
+                      $mail->Username = 'lkmoviesbazaar@gmail.com';                 //SMTP username
+                      $mail->Password = 'owabqytypgocglyz';                       //SMTP password
+                      $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;            //Enable implicit TLS encryption
+                      $mail->Port = 465;                                          //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
+                  
+                      //Recipients
+                      $mail->setFrom('lkmoviesbazaar@gmail.com', 'Verifiy');
+                      $mail->addAddress($email);     //Add a recipient
+                  
+                      //Content
+                      $mail->isHTML(true);                                  //Set email format to HTML
+                      $mail->Subject = 'Email Verification From My Cleaners Service';
+                      $mail->Body    = "Congratulation.Your succesfully Register in mycleners....click this link to login my cleaners...http://localhost/Dcsmsv-5.1%20-%20Copy/Home-Page/log.php";
+                  
+                      $mail->send();
+                      return true;
+                    } catch (Exception $e) {
+                      return false;
+                    }
+                  }
+                                
 
-                $sql3 = mysqli_query($conn, "select emp_email from employee where t_emp_id=1");
-                $row = mysqli_fetch_assoc($sql3);
+                  $sql1 = "INSERT INTO registered_employee(emp_name,emp_status,emp_filename,email,nic) SELECT distinct emp_fname,emp_qulification,emp_filename,emp_email,emp_nic from employee where t_emp_id=$row[t_emp_id]";
+                  $result1 = mysqli_query($conn, $sql1);
+              
+                  if($result1){
+                      $last_id=mysqli_insert_id($conn);
+                      $update=mysqli_query($conn,"UPDATE admin_employee_registration SET emp_id ='$last_id' where t_emp_id=$row[t_emp_id]");
+                  }
+                  
+                  if (sendmail($row['emp_email'])) {
+                    echo "<script> alert('email sent');</script>";
+                  }
+              }
 
-                if (!$row) {
-                  die("Invalid query" . mysqli_error($conn));
+              if (isset($_POST['reject_' . $row['t_emp_id'] . ''])) 
+              {
+                $email= $row['emp_email'];
+                function sendmail1($email)
+                {
+                  $mail = new PHPMailer(true);
+                
+                  try {
+                    //Server settings
+                    // $mail->SMTPDebug = SMTP::DEBUG_SERVER;                          //Enable verbose debug output
+                    $mail->isSMTP();                                                //Send using SMTP
+                    $mail->Host = 'smtp.gmail.com';                                 //Set the SMTP server to send through
+                    $mail->SMTPAuth = true;                                       //Enable SMTP authentication
+                    $mail->Username = 'lkmoviesbazaar@gmail.com';                 //SMTP username
+                    $mail->Password = 'owabqytypgocglyz';                       //SMTP password
+                    $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;            //Enable implicit TLS encryption
+                    $mail->Port = 465;                                          //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
+                
+                    //Recipients
+                    $mail->setFrom('lkmoviesbazaar@gmail.com', 'Verifiy');
+                    $mail->addAddress($email);     //Add a recipient
+                
+                    //Content
+                    $mail->isHTML(true);                                  //Set email format to HTML
+                    $mail->Subject = 'Email Verification From My Cleaners Service';
+                    $mail->Body    = "You are not registered.Try Again.";
+                
+                    $mail->send();
+                    return true;
+                  } catch (Exception $e) {
+                    return false;
+                  }
                 }
-                if (sendmail($row['emp_email'])) {
-                  echo "<script> alert('email sent');</script>";
+                if (sendmail1($row['emp_email'])) {
+                      echo "<script> alert('email sent');</script>";
                 }
               }
-              if (isset($_POST['reject'])) {
-                $sql3 = mysqli_query($conn, "select emp_email from employee where t_emp_id=1");
-                $row1 = mysqli_fetch_assoc($sql3);
-
-                if (!$row1) {
-                  die("Invalid query" . mysqli_error($conn));
-                }
-                if (sendmail1($row1['emp_email'])) {
-                  echo "<script> alert('email sent');</script>";
-                }
-              }
-
-
-
+          }
               ?>
 
               </tbody>
@@ -208,11 +260,6 @@ if (!$result) {
                 document.getElementById("form_1").style.display = "none";
               }
             </script>
-
-
-
-
-
 
 
         </div>
@@ -243,6 +290,20 @@ if (!$result) {
         $('.sidebar').removeClass('active');
       })
     </script>
+    <script>
+
+    function logOut() {
+            // Send an HTTP POST request to the logout.php script
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', 'logout.php');
+            xhr.send();
+
+            console.log('Redirecting to index.html');
+            window.location.href='../Home-Page/index.html';
+    }
+
+  </script>
+
 
 
   </body>

@@ -1,53 +1,62 @@
 <?php
- session_start();
+
+session_start();
 include_once('../Home-page/config.php');
+
+if (isset($_GET['id'])) 
+    $_SESSION['session_id'] = $_GET['id']; 
+if (isset($_GET['cusid']))
+    $_SESSION['cus_id'] = $_GET['cusid']; 
+if (isset($_GET['oid']))
+    $_SESSION['order_id'] = $_GET['oid']; 
+
 // print_r($_SESSION);
-// echo $rating;
-// $cusid=$_SESSION['id'];
 
-$sql = mysqli_query($conn, "SELECT job_order_id from job_order where cus_id=1;");
+    $cus_id = mysqli_real_escape_string($conn, $_SESSION['cus_id']);
+    $order_id = mysqli_real_escape_string($conn,$_SESSION['order_id']);
+    $sql = mysqli_query($conn, "SELECT job_order_id,aemp_id,status from job_order where job_order_id='$order_id'");
 
-$orderid = mysqli_fetch_array($sql);
-if (empty($orderid)) {
-    $orderid[0] = 0;
-}
+    $orderid = mysqli_fetch_array($sql);
+    if(!empty($orderid))
+    {
+        $oid = $orderid['job_order_id'];
+        $eid = $orderid['aemp_id'];
+    } 
 
-$id = end($orderid);
-if (isset($_POST['submit1'])) {
-
+if (isset($_POST['submit1']))
+{
 
     //data insert to table
-    if (!empty($_POST['complain'])) {
-
-
-        //$orderid = mysqli_real_escape_string($conn,$_POST['orderid']);
+    if (!empty($_POST['complain']) && $orderid['status']=='Completed') 
+    {
+        
         $complaign = mysqli_real_escape_string($conn, $_POST['complain']);
         $order_id = mysqli_real_escape_string($conn, $_POST['order_id']);
-        //$reviews   = mysqli_real_escape_string($_POST['review']);
 
-
-        $query  = "INSERT INTO complain(order_id,complain_description) VALUES ($id,'$complaign')";
+        $query  = "INSERT INTO complain(order_id,complain_description) VALUES ($oid,'$complaign')";
         $result = mysqli_query($conn, $query);
         if ($result) {
-            // echo "data inserted successfully";
-
+            echo "<script> alert('Your Complain Submitted sucessfully!');</script>";
         } else {
             echo "failed" . mysqli_error($conn);
         }
+    }else{
+        echo "<script> alert('Your Job Order is not Completed yet.if your job order already finised then go to my orders and update your work history....');</script>";
     }
 }
 
-if (isset($_POST['submit2'])) {
+if (isset($_POST['submit2'])) 
+{
     $rate=$_POST['rating'];
 
-    $sql=mysqli_query($conn,"SELECT emp_points from registered_employee where emp_id=1");
+    $sql=mysqli_query($conn,"SELECT emp_points from registered_employee where emp_id='$eid'");
     $oldrate=mysqli_fetch_array($sql);
 
     $rating=$oldrate[0] + $rate ;
-    $result1 = mysqli_query($conn,"UPDATE registered_employee SET emp_points=$rating WHERE emp_id=1");
+    $result1 = mysqli_query($conn,"UPDATE registered_employee SET emp_points=$rating WHERE emp_id='$eid'");
     if ($result1) {
-        // echo "data inserted successfully";
 
+        echo "<script> alert('Your Review Submitted sucessfully!');</script>";
     } else {
         echo "failed" . mysqli_error($conn);
     }
@@ -153,24 +162,26 @@ if (isset($_POST['submit2'])) {
 
 
             <ul class="list-unstyled px-2 ">
-                <li class=""><a href="postjob.php" class="text-decoration-none px-3 py-3 d-block">POST JOB</a></li>
-                <li class=""><a href="orderstatus.php" class="text-decoration-none px-3 py-3 d-block">ORDER STATUS</a></li>
+               <?php echo "<li class=''><a href='postjob.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."&&oid=".$_SESSION['order_id']."' class='text-decoration-none px-3 py-3 d-block'>POST JOB</a></li>"; ?>
+               <?php echo "<li class=''><a href='pendingorders.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."&&oid=".$_SESSION['order_id']."' class='text-decoration-none px-3 py-3 d-block'>PENDING ORDERS</a></li>"; ?>
+               <?php echo "<li class=''><a href='orderstatus.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."&&oid=".$_SESSION['order_id']."' class='text-decoration-none px-3 py-3 d-block'>ORDER STATUS</a></li>"; ?>
                 <!-- <li class=""><a href="payment.html" class="text-decoration-none px-3 py-3 d-block">PAYMENT</a></li> -->
-                <li class=""><a href="reshedule.php" class="text-decoration-none px-3 py-3 d-block">RESHEDULE</a></li>
-                <li class=""><a href="myorders.php" class="text-decoration-none px-3 py-3 d-block">MY ORDERS</a></li>
-                <li class="active"><a href="complaign.php" class="text-decoration-none px-3 py-3 d-block">COMPLAIN</a></li>
-                <li class=""><a href="updateprofile.php" class="text-decoration-none px-3 py-3 d-block">UPDATE PROFILE</a></li>
-                <li class=""><a href="store.php" class="text-decoration-none px-3 py-3 d-block">REWARDS</a></li>
-                <li class=""><a href="help.html" class="text-decoration-none px-3 py-3 d-block">HELP</a></li>
+                <?php echo "<li class=''><a href='reshedule.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."&&oid=".$_SESSION['order_id']."' class='text-decoration-none px-3 py-3 d-block'>RESHEDULE</a></li>"; ?>
+                <?php echo "<li class=''><a href='myorders.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."&&oid=".$_SESSION['order_id']."' class='text-decoration-none px-3 py-3 d-block'>MY ORDERS</a></li>"; ?>
+                <?php echo "<li class='active'><a href='complaign.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."&&oid=".$_SESSION['order_id']."' class='text-decoration-none px-3 py-3 d-block'>COMPLAIN</a></li>"; ?>
+                <?php echo "<li class=''><a href='updateprofile.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."&&oid=".$_SESSION['order_id']."' class='text-decoration-none px-3 py-3 d-block'>UPDATE PROFILE</a></li>"; ?>
+                <?php echo "<li class=''><a href='store.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."&&oid=".$_SESSION['order_id']."' class='text-decoration-none px-3 py-3 d-block'>REWARDS</a></li>"; ?>
+                <?php echo "<li class=''><a href='help.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."&&oid=".$_SESSION['order_id']."' class='text-decoration-none px-3 py-3 d-block'>HELP</a></li>"; ?>
 
             </ul>
-
 
         </div>
         <div class="content">
             <nav class="navbar navbar-expand-md py-3 navbar-light bg-light ">
                 <img src="image.png" class="avatar">
-                <input type="submit" class="btn btn-secondary default btn  " value="Logout" onclick="window.location.href='../Home-Page/index.html'" name="logout" />
+                <form method="POST" action="http://localhost/Dcsmsv-5.1%20-%20Copy/Home-Page/index.html">
+                    <input type="submit" class="btn btn-secondary default btn" value="Logout" onclick="logOut()" name="logout" />
+                </form>
             </nav>
 
             <div class=" dashboard-content ms-5 px-3 pt-4">
@@ -183,12 +194,12 @@ if (isset($_POST['submit2'])) {
                             <tr>
                                 <td>
                                     <lable>ORDER ID:</lable>
-                                    <input type="text" value='<?php echo $id; ?>' name="order_id" size="11" readonly />
+                                    <input type="text" value='<?php if(!empty($oid)) echo $oid; ?>' name="order_id" size="11" readonly />
                                 </td>
                             </tr>
                             <tr>
                                 <td scope="col">
-                                    <textarea class="form-control z-depth-1" name="complain" id="exampleFormControlTextarea1" rows="10" cols="50" placeholder="Type your complain here"></textarea>
+                                    <textarea class="form-control z-depth-1" name="complain" id="exampleFormControlTextarea1" rows="10" cols="50" placeholder="Type your complain here" required></textarea>
                                 </td>
                             </tr>
                             <tr>
@@ -306,6 +317,22 @@ if (isset($_POST['submit2'])) {
         $('.close-btn').on('click', function() {
             $('.sidebar').removeClass('active');
         })
+    </script>
+    <script>
+
+
+            function logOut() {
+                    // Send an HTTP POST request to the logout.php script
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('POST', 'logout.php');
+                    xhr.send();
+
+                    console.log('Redirecting to index.html');
+                    window.location.href='../Home-Page/index.html';
+            }
+
+
+
     </script>
 
 

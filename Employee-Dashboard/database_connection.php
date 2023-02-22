@@ -3,7 +3,7 @@
 $server = "localhost";
 $username = "root";
 $password = "";
-$dbname = "dcsms5";
+$dbname = "dcsms6";
   
 try {
     $conn = new PDO(

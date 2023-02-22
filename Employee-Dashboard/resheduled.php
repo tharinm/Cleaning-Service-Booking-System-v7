@@ -1,6 +1,13 @@
 <?php
+session_start();
 include_once('../Home-Page/config.php');
+ob_start(); // start output buffering
 
+if (isset($_GET['id'])) 
+  $_SESSION['session_id']= $_GET['id']; 
+
+if (isset($_GET['cusid']))
+  $_SESSION['cus_id']= $_GET['cusid'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -16,6 +23,7 @@ include_once('../Home-Page/config.php');
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="CSS/style.css">
 
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
         .navbar {
@@ -25,9 +33,8 @@ include_once('../Home-Page/config.php');
             align-items: center;
             padding: 5px;
 
-
         }
-
+        
         .avatar {
             width: 40px;
         }
@@ -43,29 +50,26 @@ include_once('../Home-Page/config.php');
                 <button class="btn d-md-none d-block close-btn px-1 py-0 text-white"><i class="fa-solid fa-bars-staggered"></i></button>
             </div>
 
-
             <ul class="list-unstyled px-2 ">
-                <li class=""><a href="findjob.php" class="text-decoration-none px-3 py-3 d-block">FIND JOB</a></li>
-                <li class=""><a href="pending.php" class="text-decoration-none px-3 py-3 d-block">MY WORK</a></li>
-                <!-- <li class=""><a href="works.php" class="text-decoration-none px-3 py-3 d-block">YOUR WORKS</a></li> -->
-                <li class="active"><a href="resheduled.php" class="text-decoration-none px-3 py-3 d-block">RESHEDULED</a></li>
-
-                <li class=""><a href="map.html" class="text-decoration-none px-3 py-3 d-block">VIEW ON MAP</a></li>
-                <li class=""><a href="cancel.php" class="text-decoration-none px-3 py-3 d-block">CANCEL JOB</a></li>
-                <li class=""><a href="store.php" class="text-decoration-none px-3 py-3 d-block">REWARDS</a></li>
-                <li class=""><a href="history.php" class="text-decoration-none px-3 py-3 d-block">HISTORY</a></li>
-
-                <li class=""><a href="updated.php" class="text-decoration-none px-3 py-3 d-block">UPDATE PROFILE</a></li>
-
+                
+                <?php echo "<li class=''><a href='findjob.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."' class='text-decoration-none px-3 py-3 d-block'>FIND JOB</a></li>"; ?>
+                <?php echo "<li class=''><a href='mywork.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."' class='text-decoration-none px-3 py-3 d-block'>MY WORK</a></li>"; ?>
+                <?php echo "<li class='active'><a href='resheduled.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."' class='text-decoration-none px-3 py-3 d-block'>RESHEDULED</a></li>"; ?>
+                <?php echo "<li class=''><a href='map.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."' class='text-decoration-none px-3 py-3 d-block'>VIEW ON MAP</a></li>"; ?>
+                <?php echo "<li class=''><a href='cancel.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."' class='text-decoration-none px-3 py-3 d-block'>CANCEL JOB</a></li>"; ?>
+                <?php echo "<li class=''><a href='store.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."' class='text-decoration-none px-3 py-3 d-block'>REWARDS</a></li>"; ?>
+                <?php echo "<li class=''><a href='history.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."' class='text-decoration-none px-3 py-3 d-block'>HISTORY</a></li>"; ?>
+                <?php echo "<li class=''><a href='updated.php?id=".$_SESSION['session_id']."&&cusid=".$_SESSION['cus_id']."' class='text-decoration-none px-3 py-3 d-block'>UPDATE PROFILE</a></li>"; ?>
             </ul>
-
 
         </div>
         <div class="content">
-            <nav class="navbar navbar-expand-md py-3 navbar-light bg-light ">
-                <img src="image.png" class="avatar">
-                <input type="submit" class="btn btn-secondary default btn  " value="Logout" onclick="window.location.href='../Home-Page/index.html'" name="logout" />
-            </nav>
+                <nav class="navbar navbar-expand-md py-3 navbar-light bg-light ">
+                    <img src="image.png" class="avatar">
+                    <form method="POST" action="http://localhost/Dcsmsv-5.1%20-%20Copy/Home-Page/index.html">
+                       <input type="submit" class="btn btn-secondary default btn" value="Logout" onclick="logOut()" name="logout" />
+                    </form>
+                </nav>
             <div class="dashboard-content ms-5 px-3 pt-4">
                 <br><br><br>
 
@@ -83,58 +87,75 @@ include_once('../Home-Page/config.php');
                         </thead>
                         <tbody class="text-center">
                             <?php
-                            $query = mysqli_query($conn, "SELECT  job_order_id,job_order_category,re_date,re_time from job_order,reshedule where job_order_id=1 and re_id=1");
+
+                            $eid = mysqli_real_escape_string($conn, $_SESSION['cus_id']);
+                            $query = mysqli_query($conn, "SELECT job_order_id,job_order_category,re_date,re_time 
+                            FROM job_order
+                            JOIN reshedule ON job_order.job_order_id=reshedule.order_id 
+                            where job_order.aemp_id=$eid and re_status='pending'");
 
 
-                            while ($row = mysqli_fetch_assoc($query)) {
+                            if(!$query)
+                            {
+                                die("invalid ".mysqli_error($conn));
+                            }else{
+                                while ($row = mysqli_fetch_assoc($query)) 
+                            {
+                                if(!empty($row))
+                                {
                                 echo   "<tr>";
                                 echo "  <td>$row[job_order_id]</td>";
                                 echo "  <td>$row[job_order_category]</td>";
                                 echo "  <td>$row[re_date]</td>";
                                 echo "  <td>$row[re_time]</td>";
                                 echo "<td>
-                             <button type='submit' value='Accept' name='accept1' class='btn btn-success ms-1'>Accept</button>
+                             <button type='submit' value='Accept' name='accept1_" . $row['job_order_id'] . "' class='btn btn-success ms-1'>Accept</button>
                              </td>";
                                 echo "<td>
-                             <button type='submit' value='Reject' name='reject11' class='btn btn-success ms-1'>Reject</button>
+                             <button type='submit' value='Reject' name='reject11_" . $row['job_order_id'] . "' class='btn btn-success ms-1'>Reject</button>
                              </td>";
 
                                 echo "  </tr>";
-                            }
+                                }
 
-                            if (isset($_POST['accept1'])) {
-                                $result = mysqli_query($conn, "UPDATE reshedule SET re_status='accept' WHERE re_id=1;");
+                            if (isset($_POST['accept1_' . $row['job_order_id'] . ''])) 
+                            {
+                                $result = mysqli_query($conn, "UPDATE reshedule SET aemp_id='$eid', re_status='accept' WHERE order_id='$row[job_order_id]' ");
                                 if (!$result) {
                                     die("ïnvalid query" . mysqli_error($conn));
                                 } else {
                                     echo " <script>alert('resheduled job accepted successfully!!!')</script>";
+                                    header("refresh: 0; http://localhost/Dcsmsv-5.1%20-%20Copy/Employee-Dashboard/mywork.php");
                                 }
                             }
-                            if (isset($_POST['reject11'])) {
+                            if (isset($_POST['reject11_' . $row['job_order_id'] . ''])) 
+                            {
 
-                                $sql = mysqli_query($conn, "SELECT * from reshedule where re_id=1");
+                                $sql = mysqli_query($conn, "SELECT * from reshedule where order_id=$row[job_order_id]");
                                 $row2 = mysqli_fetch_array($sql);
 
-                                if ($row2['re_status'] == 'pending') {
-                                    $sql2 = mysqli_query($conn, "INSERT INTO emp_reject_orders(rejected_order_id,category,date,time)VALUES($row2[re_id],'$row2[category]','$row2[re_date]','$row2[re_time]');");
+                                if ($row2['re_status'] == 'pending') 
+                                {
+                                    $sql2 = mysqli_query($conn, "INSERT INTO emp_reject_orders(rejected_order_id,category,date,time)VALUES($row2[order_id],'$row2[category]','$row2[re_date]','$row2[re_time]');");
                                     $sql3 = mysqli_query($conn, "UPDATE reshedule SET re_status ='rejected' WHERE re_id=$row2[re_id]");
-
+                                    $sql4 = mysqli_query($conn,"UPDATE job_order SET status = 'Re-Pending' WHERE job_order_id=$row[job_order_id]");
 
                                     if (!$sql2 && !$sql3) {
                                         die("ïnvalid query" . mysqli_error($conn));
                                     } else {
                                         echo " <script>alert('resheduled job rejected successfully!!!')</script>";
+                                        header("refresh: 0; http://localhost/Dcsmsv-5.1%20-%20Copy/Employee-Dashboard/findjob.php");
+                                        exit; // stop further execution 
+                                        ob_end_flush(); // flush output buffer
                                     }
                                 }
-                            }
-
+                            } 
+                          }
+                        }
+                            
                             ?>
                         </tbody>
-
                     </table>
-
-
-
             </div>
         </div>
 
@@ -143,7 +164,6 @@ include_once('../Home-Page/config.php');
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.min.js" integrity="sha384-IDwe1+LCz02ROU9k972gdyvl+AESN10+x7tBKgc9I5HFtuNz0wWnPclzo6p9vxnk" crossorigin="anonymous"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <script src="https://kit.fontawesome.com/c752b78af3.js" crossorigin="anonymous"></script>
-
 
         <script>
             $(".sidebar ul li").on('click', function() {
@@ -160,7 +180,19 @@ include_once('../Home-Page/config.php');
                 $('.sidebar').removeClass('active');
             })
         </script>
+        <script>
 
+            function logOut() {
+            // Send an HTTP POST request to the logout.php script
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', 'logout.php');
+            xhr.send();
+
+            console.log('Redirecting to index.html');
+            window.location.href='../Home-Page/index.html';
+            }
+
+        </script>
 
 </body>
 

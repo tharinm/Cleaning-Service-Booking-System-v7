@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Location</title>
+  </head>
+  <body>
+    <input type="text" id="cityInput" />
+
+    <script>
+      language="JavaScript"
+      src="http://www.geoplugin.net/javascript.gp"
+      type="text/javascript"
+    </script>
+
+    <script>
+      var citie = document.getElementById("cityInput");
+        // citie.addEventListener("click",geoplugin_city)
+
+        function getUserCity() {
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", "http://www.geoplugin.net/json.gp");
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+      var response = JSON.parse(xhr.responseText);
+      var city = response.geoplugin_city;
+      //console.log("City:", city);
+    document.getElementById("cityInput").placeholder=city
+    }
+  };
+  xhr.send();
+}
+
+    // console.log(city)
+      getUserCity()
+      // console.log("IP:", geoplugin_request());
+      // console.log("IP:", geoplugin_city());
+    </script>
+  </body>
+</html>
+

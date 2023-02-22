@@ -1,7 +1,6 @@
 <?php
 include_once('../Home-Page/config.php');
 
-
   if (isset($_POST['submit']))
   {
   $fname = $conn->real_escape_string($_POST['fname']);
@@ -20,8 +19,7 @@ include_once('../Home-Page/config.php');
      {  
         $chk.= $chk1.",";  
      }
-      
-  
+        
      //$profile = $_FILES['image']['name']; 
         // File name
        $filename = $_FILES['image']['name'];
@@ -36,8 +34,7 @@ include_once('../Home-Page/config.php');
         $file_extension = strtolower($file_extension);
      
      //$quliphoto = $_FILES['image2']['name']; 
-  
-  
+ 
   $query1  = "INSERT INTO employee(emp_fname,emp_lname,emp_address,emp_email,emp_nic,emp_postalcode,emp_bankname,emp_bankacc,emp_categories,emp_photo,emp_qulification) VALUES ('$fname','$lname','$address','$email','$nic','$postalcode','$bankname','$bankaccno','$chk', '$filename','$qualification',)";
   $result = $conn->query($query1);
   
@@ -50,7 +47,6 @@ include_once('../Home-Page/config.php');
   }
 }
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">

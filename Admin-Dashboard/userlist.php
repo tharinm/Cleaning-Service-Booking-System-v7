@@ -1,5 +1,8 @@
 <?php
+session_start();
 include_once('../Home-Page/config.php');
+if (isset($_GET['id'])) 
+    $_SESSION['session_id'] = $_GET['id']; 
 
 ?>
 
@@ -32,13 +35,12 @@ include_once('../Home-Page/config.php');
 
 
             <ul class="list-unstyled px-2 ">
-                <li class=""><a href="registeremployee.php" class="text-decoration-none px-3 py-3 d-block">REGISTER EMPLOYEE</a></li>
-                <li class=""><a href="payment.php" class="text-decoration-none px-3 py-3 d-block">PAYMENT</a></li>
-                <li class=""><a href="work.php" class="text-decoration-none px-3 py-3 d-block">WORKS</a></li>
-                <li class=""><a href="emplyoeelist.php" class="text-decoration-none px-3 py-3 d-block">EMPLOYEE LIST</a></li>
-                <li class="active"><a href="userlist.php" class="text-decoration-none px-3 py-3 d-block">USER LIST</a></li>
-                <li class=""><a href="complaign.php" class="text-decoration-none px-3 py-3 d-block">COMPLAINS</a></li>
-
+                <?php echo "<li class=''><a href='registeremployee.php?id=".$_SESSION['session_id']."' class='text-decoration-none px-3 py-3 d-block'>REGISTER EMPLOYEE</a></li>" ?>
+                <?php echo "<li class=''><a href='payment.php?id=".$_SESSION['session_id']."' class='text-decoration-none px-3 py-3 d-block'>PAYMENT</a></li> " ?>
+                <?php echo "<li class=''><a href='work.php?id=".$_SESSION['session_id']."' class='text-decoration-none px-3 py-3 d-block'>WORKS</a></li> "?>
+                <?php echo "<li class=''><a href='emplyoeelist.php?id=".$_SESSION['session_id']."' class='text-decoration-none px-3 py-3 d-block'>EMPLOYEE LIST</a></li> "?>
+                <?php echo "<li class='active'><a href='userlist.php?id=".$_SESSION['session_id']."' class='text-decoration-none px-3 py-3 d-block'>USER LIST</a></li>" ?>
+                <?php echo "<li class=''><a href='complaign.php?id=".$_SESSION['session_id']."' class='text-decoration-none px-3 py-3 d-block'>COMPLAINS</a></li>" ?>
 
             </ul>
 
@@ -48,17 +50,19 @@ include_once('../Home-Page/config.php');
 
         <nav class="navbar navbar-expand-md py-3 navbar-light bg-light ">
 
-        <div class="search" align="left">
-        <form id="search-form">
-            <label for="search">Enter search term:</label>
-            <input type="text" id="search" name="search">
-            <input type="submit" value="Search">
-            </form>
-        </div>
+                <div class="search" align="left">
+                <form id="search-form">
+                    <label for="search">Enter search term:</label>
+                    <input type="text" id="search" name="search">
+                    <input type="submit" value="Search">
+                    </form>
+                </div>
             
                 <img src="image.png" class="avatar">
-                <input type="submit" class="btn btn-secondary default btn  " value="Logout" onclick="window.location.href='../Home-Page/index.html'" name="logout">
-            </nav>
+                    <form method="POST" action="http://localhost/Dcsmsv-5.1%20-%20Copy/Home-Page/index.html">
+                        <input type="submit" class="btn btn-secondary default btn" value="Logout" onclick="logOut()" name="logout" />
+                    </form>
+        </nav>
 
             <script>
                 $(document).ready(function() {
@@ -102,17 +106,17 @@ include_once('../Home-Page/config.php');
                     <tbody>
                         
                         <?php
-                            $query = mysqli_query($conn, "SELECT  cus_id,email,address,nic from customer ");
+                            $query = mysqli_query($conn, "SELECT  * from customer ");
 
                             while ($row = mysqli_fetch_assoc($query)) {
-                            $query1 = mysqli_query($conn,"SELECT COUNT(status) FROM job_order WHERE status='Accept' and cus_id=$row[cus_id]");
+                            $query1 = mysqli_query($conn,"SELECT COUNT(status) as count FROM job_order WHERE status='Completed' and cus_id=$row[cus_id]");
                             $count = mysqli_fetch_array($query1);
                             echo   "<tr>";
                             echo "  <td>$row[cus_id]</td>";
                             echo "  <td>$row[address]</td>";
                             echo "  <td>$row[email]</td>";
                             echo "  <td>$row[nic]</td>";
-                            echo "  <td>$count[0]</td>";
+                            echo "  <td>$count[count]</td>";
                             echo "  </tr>";
                             }
                         ?>
@@ -147,6 +151,19 @@ include_once('../Home-Page/config.php');
         $('.close-btn').on('click', function() {
             $('.sidebar').removeClass('active');
         })
+    </script>
+    <script>
+
+        function logOut() {
+                // Send an HTTP POST request to the logout.php script
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', 'logout.php');
+                xhr.send();
+
+                console.log('Redirecting to index.html');
+                window.location.href='../Home-Page/index.html';
+        }
+
     </script>
 
 

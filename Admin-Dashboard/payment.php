@@ -1,5 +1,11 @@
 <?php
+session_start();
+
 include_once('../Home-page/config.php');
+ob_start(); // start output buffering
+
+if (isset($_GET['id'])) 
+    $_SESSION['session_id'] = $_GET['id']; 
 
 if (isset($_POST['pay'])) {
   $payment = $_POST['text'];
@@ -20,41 +26,46 @@ if (isset($_POST['pay'])) {
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
   <link rel="stylesheet" href="CSS/payment.css">
+  
 
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
   <!-- jQuery library -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 </head>
 
 <body>
 
-  <div class="main-container d-flex">
-    <div class="sidebar " id="side_nav">
-      <div class="header-box px-2 pt-3 pb-4 d-flex justify-content-between">
-        <h1 class="fs-4 ms-2 name"><span class="text">DCSMS</span></h1>
-        <button class="btn d-md-none d-block close-btn px-1 py-0 text-white"><i class="fa-solid fa-bars-staggered"></i></button>
-      </div>
+<div class="main-container d-flex">
+        <div class="sidebar " id="side_nav">
+            <div class="header-box px-2 pt-3 pb-4 d-flex justify-content-between">
+                <h1 class="fs-4 ms-2 name"><span class="text">DCSMS</span></h1>
+                <button class="btn d-md-none d-block close-btn px-1 py-0 text-white"><i class="fa-solid fa-bars-staggered"></i></button>
+            </div>
 
+            <ul class="list-unstyled px-2 ">
+                <?php echo "<li class=''><a href='registeremployee.php?id=".$_SESSION['session_id']."' class='text-decoration-none px-3 py-3 d-block'>REGISTER EMPLOYEE</a></li>" ?>
+                <?php echo "<li class='active'><a href='payment.php?id=".$_SESSION['session_id']."' class='text-decoration-none px-3 py-3 d-block'>PAYMENT</a></li> " ?>
+                <?php echo "<li class=''><a href='work.php?id=".$_SESSION['session_id']."' class='text-decoration-none px-3 py-3 d-block'>WORKS</a></li> "?>
+                <?php echo "<li class=''><a href='emplyoeelist.php?id=".$_SESSION['session_id']."' class='text-decoration-none px-3 py-3 d-block'>EMPLOYEE LIST</a></li> "?>
+                <?php echo "<li class=''><a href='userlist.php?id=".$_SESSION['session_id']."' class='text-decoration-none px-3 py-3 d-block'>USER LIST</a></li>" ?>
+                <?php echo "<li class=''><a href='complaign.php?id=".$_SESSION['session_id']."' class='text-decoration-none px-3 py-3 d-block'>COMPLAINS</a></li>" ?>
 
-      <ul class="list-unstyled px-2 ">
-        <li class=""><a href="registeremployee.php" class="text-decoration-none px-3 py-3 d-block">REGISTER EMPLOYEE</a></li>
-        <li class="active"><a href="payment.php" class="text-decoration-none px-3 py-3 d-block">PAYMENT</a></li>
-        <li class=""><a href="work.php" class="text-decoration-none px-3 py-3 d-block">WORKS</a></li>
-        <li class=""><a href="emplyoeelist.php" class="text-decoration-none px-3 py-3 d-block">EMPLOYEE LIST</a></li>
-        <li class=""><a href="userlist.php" class="text-decoration-none px-3 py-3 d-block">USER LIST</a></li>
-        <li class=""><a href="complaign.php" class="text-decoration-none px-3 py-3 d-block">COMPLAINS</a></li>
-
-
-      </ul>
-
+            </ul>
 
     </div>
     <div class="content">
-      <nav class="navbar navbar-expand-md py-3 navbar-light bg-light ">
-        <img src="image.png" class="avatar">
-        <input type="submit" class="btn btn-secondary default btn  " value="Logout" onclick="window.location.href='../Home-Page/index.html'" name="logout">
-      </nav>
-
+    <nav class="navbar navbar-expand-md py-3 navbar-light bg-light ">
+                <img src="image.png" class="avatar">
+                <form method="POST" action="http://localhost/Dcsmsv-5.1%20-%20Copy/Home-Page/index.html">
+                    <input type="submit" class="btn btn-secondary default btn" value="Logout" onclick="logOut()" name="logout" />
+                </form>
+            </nav>
+                            
       <div class="payment ms-5 px-3 pt-4">
+        <button class="btn btn-info mb-3 text-white">
+          <a href="https://www.stripe.com" class="text-white text-decoration-none">Go To Bank</a>
+        </button>
+      <form method="POST" action="">
         <table class="table">
           <h6 class="mb-3">Employee Withdrawal Request</h6>
           <thead class="col-sm-4">
@@ -68,26 +79,42 @@ if (isset($_POST['pay'])) {
           </thead>
           <tbody>
             <?php
-            $query = mysqli_query($conn, "SELECT  emp_id,email,bank_acc,amount from registered_employee,emp_withdrawal_request where emp_id=1 and request_id=1 ");
+            $query = mysqli_query($conn, "SELECT  * from emp_withdrawal_request 
+            JOIN registered_employee ON registered_employee.emp_id=emp_withdrawal_request.emp_id  
+            WHERE status like 'pending'");
 
-            while ($row = mysqli_fetch_assoc($query)) {
-              echo   "<tr>";
-              echo "  <td>$row[emp_id]</td>";
-              echo "  <td>$row[email]</td>";
-              echo "  <td>$row[bank_acc]</td>";
-              echo "  <td>$row[amount]</td>";
+            while ($row = mysqli_fetch_assoc($query)) 
+            {
 
+              if(!empty($row))
+              {
+                  echo   "<tr>";
+                  echo "  <td>$row[emp_id]</td>";
+                  echo "  <td>$row[email]</td>";
+                  echo "  <td>$row[bank_acc]</td>";
+                  echo "  <td>$row[amount]</td>";
+                  echo "<td>
+                
+                  <a href= class=''><input type='submit'  name='pay_" . $row['emp_id'] . "' value='Pay' class='btn btn-dark btn-sm col-sm-12'></a> ";
+                
+                  echo " </td>
+                        </tr>";
+              }
 
-              echo "<td>";
-              // <button type='submit' value='Pay' name='employeepay' class='btn btn-success ms-1'>PAY</button>";
-            ?>
-              <a href="https://dashboard.stripe.com/test/payments/new" class=""><input type="submit" value="Pay" class="btn btn-dark btn-sm col-sm-12" name=<?php echo "pay_$row[emp_id]"?>></a>
-            <?php " </td>";
-              echo "  </tr>";
-            }
+              if (isset($_POST['pay_' . $row['emp_id']])) 
+              {
+                  $result= mysqli_query($conn," UPDATE emp_withdrawal_request SET status='success' WHERE emp_id=$row[emp_id]");
+                  if(!$result)
+                    die("invalid query".mysqli_error($conn));
+                  else
+                  header("refresh: 0; url=https://dashboard.stripe.com/test/payments/new ");
+              }
+            }  
             ?>
           </tbody>
         </table>
+      </form>
+      <form method="POST" action="">
         <table class="table">
           <h6 class="mb-3">Customer Refund Request</h6>
           <thead class="col-sm-4">
@@ -101,28 +128,43 @@ if (isset($_POST['pay'])) {
           <tbody>
            
             <?php
-            $query1 = mysqli_query($conn, "SELECT refunds.cus_id,customer.email,refunds.amount FROM refunds JOIN customer ON refunds.cus_id = customer.cus_id where refunds.cus_id=1");
+            $query1 = mysqli_query($conn, "SELECT * 
+            FROM refunds 
+            JOIN customer ON refunds.cus_id = customer.cus_id 
+            WHERE refunds.status like 'pending' ");
 
-            while ($row1 = mysqli_fetch_assoc($query1)) {
-              echo "  <td>$row1[cus_id]</td>";
-              echo "  <td>$row1[email]</td>";
-              echo "  <td>$row1[amount]</td>";
-              echo "<td></td>";
+            while ($row1 = mysqli_fetch_assoc($query1)) 
+            {
+              if(!empty($row1))
+              {
+                  echo "  <td>$row1[cus_id]</td>";
+                  echo "  <td>$row1[email]</td>";
+                  echo "  <td>$row1[amount]</td>";
+                  echo "<td></td>";
 
+                  echo "<td>
+                    
+                  <a href= class=''><input type='submit'  name='rpay_" . $row1['cus_id'] . "' value='Pay' class='btn btn-dark btn-sm col-sm-12'></a> ";
+                
+                  echo " </td>
+                        </tr>";
+              }
 
-              echo "<td>";
-            ?>
-              <a href="https://dashboard.stripe.com/test/payments?status[0]=successful "><input type="submit" value="Pay" class="btn btn-dark btn-sm col-sm-12" name="pay"></a>
-
-            <?php echo " </td>
-                </tr>";
-            }
-            ?>
-
-            <!-- <td scope="col"><a href="#" class="btn btn-primary text-white btn-sm col-sm-6">EDIT</a></td> -->
-
-          </tbody>
-        </table>
+              if (isset($_POST['rpay_' . $row1['cus_id']])) 
+              {
+                  $result= mysqli_query($conn," UPDATE refunds SET status='success' WHERE rf_id=$row1[rf_id]");
+                  if(!$result)
+                    die("invalid query".mysqli_error($conn));
+                  else
+                    header("refresh: 0; url=https://dashboard.stripe.com/test/payments/new ");
+                    exit; // stop further execution 
+                    ob_end_flush(); // flush output buffer
+              }
+            }  
+        ?>
+            </tbody>
+          </table>
+        </form>
       </div>
     </div>
 
@@ -147,6 +189,19 @@ if (isset($_POST['pay'])) {
       $('.close-btn').on('click', function() {
         $('.sidebar').removeClass('active');
       })
+    </script>
+    <script>
+
+      function logOut() {
+              // Send an HTTP POST request to the logout.php script
+              var xhr = new XMLHttpRequest();
+              xhr.open('POST', 'logout.php');
+              xhr.send();
+
+              console.log('Redirecting to index.html');
+              window.location.href='../Home-Page/index.html';
+      }
+
     </script>
 
 
